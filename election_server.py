@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 """
-שרת בחירות עצמאי בישראל (Israel Election Server)
-שרת HTTP ו-REST API מובנה ב-Python (ללא צורך בספריות חיצוניות).
-תכונות:
-1. מגיש את ממשק הבוחר וממשק מנהל הבחירות (israel_elections_app.html).
-2. מזהה כתובת IP אמיתית של כל פונה ואוכף הגבלה של הצבעה אחת בלבד לכל כתובת IP.
-3. ניהול מסד נתונים מאובטח בקובץ JSON (elections_data.json) ללא תלות בדרייברים חיצוניים.
-4. חישוב תוצאות אמת, אחוזי הצבעה, אחוז חסימה (3.25%) וחלוקת 120 מנדטים לפי שיטת בדר-עופר.
-5. שיתוף קישור, איפוס קלפי והזרקת נתוני דמה לבדיקה.
+שרת בחירות 2026 לכנסת ה-26 (27 באוקטובר 2026)
+Python HTTP & REST API Server (Built-in standard library).
 """
 
 import http.server
@@ -23,26 +17,216 @@ DATA_FILE = "elections_data.json"
 HTML_FILE = "israel_elections_app.html"
 
 PARTIES = [
-    {"id": "mahal", "letter": "מחל", "name": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה", "short": "הליכוד", "color": "#1877f2", "bloc": "right"},
-    {"id": "po", "letter": "פה", "name": "יש עתיד בראשות יאיר לפיד", "short": "יש עתיד", "color": "#00a3e0", "bloc": "center_left"},
-    {"id": "ken", "letter": "כן", "name": "המחנה הממלכתי בהנהגת בני גנץ", "short": "המחנה הממלכתי", "color": "#002b49", "bloc": "center_left"},
-    {"id": "tet", "letter": "ט", "name": "מפלגת הציונות הדתית בראשות בצלאל סמוטריץ'", "short": "הציונות הדתית", "color": "#e87722", "bloc": "right"},
-    {"id": "bet", "letter": "ב", "name": "עוצמה יהודית בראשות איתמר בן גביר", "short": "עוצמה יהודית", "color": "#c8102e", "bloc": "right"},
-    {"id": "shas", "letter": "שס", "name": "התאחדות הספרדים שומרי תורה תנועת ש\"ס", "short": "ש\"ס", "color": "#2c3e50", "bloc": "right"},
-    {"id": "gimel", "letter": "ג", "name": "יהדות התורה והשבת אגודת ישראל - דגל התורה", "short": "יהדות התורה", "color": "#34495e", "bloc": "right"},
-    {"id": "lamed", "letter": "ל", "name": "ישראל ביתנו בראשות אביגדור ליברמן", "short": "ישראל ביתנו", "color": "#005596", "bloc": "right"},
-    {"id": "emet", "letter": "אמת", "name": "הדמוקרטים (מפלגת העבודה ומרצ) בראשות יאיר גולן", "short": "הדמוקרטים", "color": "#008850", "bloc": "center_left"},
-    {"id": "am", "letter": "עם", "name": "רע\"ם - הרשימה הערבית המאוחדת", "short": "רע\"ם", "color": "#007a3d", "bloc": "arab"},
-    {"id": "um", "letter": "ום", "name": "חד\"ש - תע\"ל בראשות איימן עודה ואחמד טיבי", "short": "חד\"ש-תע\"ל", "color": "#d9232a", "bloc": "arab"},
-    {"id": "dalet", "letter": "ד", "name": "בל\"ד - אלתג'מוע אלדמוקרטי", "short": "בל\"ד", "color": "#f58220", "bloc": "arab"},
-    {"id": "rak", "letter": "רק", "name": "ביחד בראשות נפתלי בנט", "short": "ביחד", "color": "#2563eb", "bloc": "center_left"},
-    {"id": "derech", "letter": "דרך", "name": "ישר בראשות גדי איזנקוט", "short": "ישר", "color": "#4f46e5", "bloc": "center_left"},
-    {"id": "ni", "letter": "ני", "name": "מפלגת נעם בראשות אבי מעוז", "short": "נעם", "color": "#854d0e", "bloc": "right"},
-    {"id": "day", "letter": "די", "name": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה", "short": "המילואימניקים", "color": "#0d9488", "bloc": "other"},
-    {"id": "kach", "letter": "ך", "name": "עמך ישראל בראשות עופר וינטר", "short": "עמך ישראל", "color": "#15803d", "bloc": "right"},
-    {"id": "yod", "letter": "י", "name": "ישראל תחילה בראשות שרן השכל", "short": "ישראל תחילה", "color": "#7e22ce", "bloc": "other"},
-    {"id": "zach", "letter": "זך", "name": "צעירים בוערים", "short": "צעירים בוערים", "color": "#ea580c", "bloc": "other"},
-    {"id": "blank", "letter": "פתק לבן", "name": "פתק לבן (הצבעת מחאה / קול נמנע)", "short": "פתק לבן", "color": "#9ca3af", "bloc": "invalid"}
+  {
+    "id": "mahal",
+    "letter": "מחל",
+    "name": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה",
+    "short": "הליכוד",
+    "leader": "בנימין נתניהו",
+    "color": "#1877f2",
+    "bloc": "right",
+    "ballot_sub": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה"
+  },
+  {
+    "id": "po",
+    "letter": "פה",
+    "name": "יש עתיד בראשות יאיר לפיד",
+    "short": "יש עתיד",
+    "leader": "יאיר לפיד",
+    "color": "#00a3e0",
+    "bloc": "center_left",
+    "ballot_sub": "יש עתיד בראשות יאיר לפיד"
+  },
+  {
+    "id": "ken",
+    "letter": "כן",
+    "name": "כחול לבן המחנה הממלכתי בהנהגת בני גנץ",
+    "short": "המחנה הממלכתי",
+    "leader": "בני גנץ",
+    "color": "#002b49",
+    "bloc": "center_left",
+    "ballot_sub": "כחול לבן המחנה הממלכתי בהנהגת בני גנץ"
+  },
+  {
+    "id": "rak",
+    "letter": "רק",
+    "name": "ביחד בראשות נפתלי בנט",
+    "short": "ביחד",
+    "leader": "נפתלי בנט",
+    "color": "#2563eb",
+    "bloc": "center_left",
+    "ballot_sub": "ביחד בראשות נפתלי בנט"
+  },
+  {
+    "id": "derech",
+    "letter": "דרך",
+    "name": "ישר בראשות גדי איזנקוט",
+    "short": "ישר",
+    "leader": "גדי איזנקוט",
+    "color": "#4f46e5",
+    "bloc": "center_left",
+    "ballot_sub": "ישר בראשות גדי איזנקוט"
+  },
+  {
+    "id": "emet",
+    "letter": "אמת",
+    "name": "הדמוקרטים בראשות יאיר גולן",
+    "short": "הדמוקרטים",
+    "leader": "יאיר גולן",
+    "color": "#008850",
+    "bloc": "center_left",
+    "ballot_sub": "הדמוקרטים בראשות יאיר גולן"
+  },
+  {
+    "id": "tet",
+    "letter": "ט",
+    "name": "מפלגת הציונות הדתית וזהות בראשות בצלאל סמוטריץ' ומשה פייגלין",
+    "short": "הציונות הדתית וזהות",
+    "leader": "בצלאל סמוטריץ' ומשה פייגלין",
+    "color": "#e87722",
+    "bloc": "right",
+    "ballot_sub": "מפלגת הציונות הדתית וזהות בראשות סמוטריץ' ופייגלין"
+  },
+  {
+    "id": "bet",
+    "letter": "ב",
+    "name": "עוצמה יהודית בראשות איתמר בן גביר",
+    "short": "עוצמה יהודית",
+    "leader": "איתמר בן גביר",
+    "color": "#c8102e",
+    "bloc": "right",
+    "ballot_sub": "עוצמה יהודית בראשות איתמר בן גביר"
+  },
+  {
+    "id": "shas",
+    "letter": "שס",
+    "name": "התאחדות הספרדים שומרי תורה תנועת ש\"ס",
+    "short": "ש\"ס",
+    "leader": "אריה דרעי",
+    "color": "#2c3e50",
+    "bloc": "right",
+    "ballot_sub": "התאחדות הספרדים שומרי תורה תנועת ש\"ס"
+  },
+  {
+    "id": "gimel",
+    "letter": "ג",
+    "name": "יהדות התורה והשבת אגודת ישראל - דגל התורה",
+    "short": "יהדות התורה",
+    "leader": "יצחק גולדקנופף ומשה גפני",
+    "color": "#34495e",
+    "bloc": "right",
+    "ballot_sub": "יהדות התורה והשבת אגודת ישראל - דגל התורה"
+  },
+  {
+    "id": "lamed",
+    "letter": "ל",
+    "name": "ישראל ביתנו בראשות אביגדור ליברמן",
+    "short": "ישראל ביתנו",
+    "leader": "אביגדור ליברמן",
+    "color": "#005596",
+    "bloc": "right",
+    "ballot_sub": "ישראל ביתנו בראשות אביגדור ליברמן"
+  },
+  {
+    "id": "am",
+    "letter": "עם",
+    "name": "רע\"ם - הרשימה הערבית המאוחדת",
+    "short": "רע\"ם",
+    "leader": "מנסור עבאס",
+    "color": "#007a3d",
+    "bloc": "arab",
+    "ballot_sub": "רע\"ם - הרשימה הערבית המאוחדת"
+  },
+  {
+    "id": "vdm",
+    "letter": "ודם",
+    "name": "חד\"ש - תע\"ל בראשות איימן עודה ואחמד טיבי",
+    "short": "חד\"ש-תע\"ל",
+    "leader": "איימן עודה ואחמד טיבי",
+    "color": "#d9232a",
+    "bloc": "arab",
+    "ballot_sub": "חד\"ש - תע\"ל בראשות איימן עודה ואחמד טיבי"
+  },
+  {
+    "id": "dalet",
+    "letter": "ד",
+    "name": "בל\"ד - אלתג'מוע אלדמוקרטי",
+    "short": "בל\"ד",
+    "leader": "סאמי אבו שחאדה",
+    "color": "#f58220",
+    "bloc": "arab",
+    "ballot_sub": "בל\"ד - אלתג'מוע אלדמוקרטי"
+  },
+  {
+    "id": "ni",
+    "letter": "ני",
+    "name": "מפלגת נעם לישראל בראשות אבי מעוז",
+    "short": "נעם",
+    "leader": "אבי מעוז",
+    "color": "#854d0e",
+    "bloc": "right",
+    "ballot_sub": "נעם לישראל בראשות אבי מעוז"
+  },
+  {
+    "id": "day",
+    "letter": "די",
+    "name": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה",
+    "short": "המילואימניקים",
+    "leader": "יועז הנדל וירון זליכה",
+    "color": "#0d9488",
+    "bloc": "other",
+    "ballot_sub": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה"
+  },
+  {
+    "id": "kach",
+    "letter": "ך",
+    "name": "עמך ישראל בראשות עופר וינטר",
+    "short": "עמך ישראל",
+    "leader": "עופר וינטר",
+    "color": "#15803d",
+    "bloc": "right",
+    "ballot_sub": "עמך ישראל בראשות עופר וינטר"
+  },
+  {
+    "id": "yod",
+    "letter": "י",
+    "name": "ישראל תחילה בראשות שרן השכל",
+    "short": "ישראל תחילה",
+    "leader": "שרן השכל",
+    "color": "#7e22ce",
+    "bloc": "other",
+    "ballot_sub": "ישראל תחילה בראשות שרן השכל"
+  },
+  {
+    "id": "hei",
+    "letter": "ה",
+    "name": "גן עדן בראשות ישוע ישראל בן דוד",
+    "short": "גן עדן",
+    "leader": "ישוע ישראל בן דוד",
+    "color": "#14b8a6",
+    "bloc": "other",
+    "ballot_sub": "גן עדן בראשות ישוע ישראל בן דוד"
+  },
+  {
+    "id": "zach",
+    "letter": "זך",
+    "name": "צעירים בוערים",
+    "short": "צעירים בוערים",
+    "leader": "הדר מוכתר",
+    "color": "#ea580c",
+    "bloc": "other",
+    "ballot_sub": "צעירים בוערים"
+  },
+  {
+    "id": "blank",
+    "letter": "פתק לבן",
+    "name": "פתק לבן (הצבעת מחאה / קול פסול)",
+    "short": "פתק לבן",
+    "leader": "קול פסול",
+    "color": "#9ca3af",
+    "bloc": "invalid",
+    "ballot_sub": "פתק לבן ריק - ללא אותיות"
+  }
 ]
 
 def load_data():
@@ -210,7 +394,7 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             party_id = payload.get("party_id")
 
             if not party_id:
-                self.send_json({"error": "נא לספק מזהה מפלגה (party_id)"}, 400)
+                self.send_json({"error": "נא לספק מזהה מפלגה"}, 400)
                 return
 
             valid_party = next((p for p in PARTIES if p["id"] == party_id), None)
@@ -221,7 +405,6 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             data = load_data()
             voted_ips = data.setdefault("voted_ips", {})
 
-            # Enforce 1 vote per IP
             if ip in voted_ips:
                 self.send_json({
                     "error": f"כתובת ה-IP שלך ({ip}) כבר הצביעה במערכת. כל IP רשאי להצביע פעם אחת בלבד.",
@@ -256,21 +439,7 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 "votes": {p["id"]: 0 for p in PARTIES}
             }
             save_data(initial)
-            self.send_json({"success": True, "message": "נתוני הקלפי ויומן ה-IP אופסו בהצלחה"})
-            return
-
-        if path == "/api/seed":
-            data = load_data()
-            sample_votes = {
-                "mahal": 2450, "po": 1820, "ken": 1150, "tet": 780,
-                "bet": 820, "shas": 840, "gimel": 610, "lamed": 550,
-                "emet": 430, "am": 380, "um": 370, "dalet": 120,
-                "rak": 250, "derech": 190, "blank": 110
-            }
-            for pid, count in sample_votes.items():
-                data["votes"][pid] = count
-            save_data(data)
-            self.send_json({"success": True, "message": "10,000 קולות דמה הוזרקו בהצלחה לבדיקה"})
+            self.send_json({"success": True, "message": "נתוני הקלפי אופסו בהצלחה"})
             return
 
         self.send_json({"error": "Endpoint not found"}, 404)
@@ -279,10 +448,9 @@ if __name__ == "__main__":
     load_data()
     port = int(sys.argv[1]) if len(sys.argv) > 1 else PORT
     print(f"=====================================================")
-    print(f"  🇮🇱 שרת הבחירות הדיגיטליות פועל בכתובת:")
+    print(f"  🇮🇱 שרת בחירות 2026 לכנסת ה-26 פועל בכתובת:")
     print(f"  http://localhost:{port}")
-    print(f"  אכיפת IP: מוגבל להצבעה אחת בלבד לכל כתובת IP")
-    print(f"  שיטת חלוקת מושבים: חוק בדר-עופר (120 מנדטים)")
+    print(f"  הגבלת 1 הצבעה ל-IP & חלוקת 120 מנדטים בדר-עופר")
     print(f"=====================================================")
     with socketserver.TCPServer(("", port), ElectionHandler) as httpd:
         try:
