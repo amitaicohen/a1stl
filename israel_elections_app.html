@@ -1505,7 +1505,7 @@
         const card = document.createElement("div");
         card.className = "ballot-slip-card" + (this.id === "blank" ? " blank-slip" : "");
         card.id = "ballot-card-" + this.id;
-        card.dataset.partyId = this.id;
+        card.setAttribute('data-party-id', this.id);
         card.title = "דאבל-קליק להכנסת הפתק למעטפה והצבעה מיידית";
 
         // Double Click on PC
@@ -1701,7 +1701,7 @@
       }
 
       // Instantiate BallotSlip objects for each party
-      ballotObjects = PARTIES.map(p => new BallotSlip(p));
+      ballotObjects = PARTIES.map(p => new BallotSlip(p)); window.ballotObjects = ballotObjects;
 
       // Check URL parameters
       const params = new URLSearchParams(window.location.search);
@@ -1997,7 +1997,7 @@
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 10px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("יו"ר", centerX, centerY - 14);
+      ctx.fillText("יו״ר", centerX, centerY - 14);
     }
 
     // IP Management Tools
@@ -2203,6 +2203,22 @@
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3500);
     }
+  
+    // Expose all handlers to global window object
+    window.switchView = switchView;
+    window.openShareModal = openShareModal;
+    window.closeShareModal = closeShareModal;
+    window.copyShareLink = copyShareLink;
+    window.setCategoryFilter = setCategoryFilter;
+    window.filterBallots = filterBallots;
+    window.seedSampleVotes = seedSampleVotes;
+    window.confirmResetVotes = confirmResetVotes;
+    window.exportResultsCSV = exportResultsCSV;
+    window.generateRandomIP = generateRandomIP;
+    window.setManualIP = setManualIP;
+    window.clearCurrentIPVote = clearCurrentIPVote;
+    window.removeSingleIP = removeSingleIP;
+
   </script>
 </body>
 </html>
