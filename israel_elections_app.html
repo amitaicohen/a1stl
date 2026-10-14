@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערכת הבחירות הדיגיטלית | קלפי אינטרנטית ולוח מנהל בחירות</title>
+  <meta name="description" content="מערכת בחירות דיגיטלית מתקדמת לבחירת מפלגות בישראל על פי פתקי הצבעה רשמיים, הגבלת הצבעה אחת ל-IP, לוח תוצאות מנהל הבחירות עם חלוקת מנדטים (בדר-עופר) ואפשרות שיתוף קישור.">
+  <style>
+    :root {
+      --primary: #0f2744;
+      --primary-light: #1e3a8a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --gold: #d97706;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --ballot-paper: #fefefb;
+      --ballot-border: #111827;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+      --shadow-ballot: 0 6px 16px rgba(0,0,0,0.09), 0 2px 4px rgba(0,0,0,0.05);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #091a30 0%, #0f2744 100%);
+      color: #ffffff;
+      padding: 1rem 1.5rem;
+      border-bottom: 3px solid var(--accent);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .emblem {
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      color: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .title-group h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .title-group p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.35rem;
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #e2e8f0;
+      padding: 0.5rem 1rem;
+      border-radius: 7px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    /* IP & Status Bar */
+    .status-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .status-bar-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .ip-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f1f5f9;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .voter-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .voter-status-pill.can-vote {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .voter-status-pill.voted {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Instructions & Search */
+    .hero-instructions {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+    }
+
+    .instructions-text h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.35rem;
+    }
+
+    .instructions-text p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #ffffff;
+    }
+
+    /* Filter & Search Bar */
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 0.4rem 0.85rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Ballot Slips Grid (מגש פתקים בקלפי) */
+    .ballots-tray-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ballots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Realistic Israeli Ballot Slip Styling */
+    .ballot-slip {
+      background: var(--ballot-paper);
+      border: 2px solid var(--ballot-border);
+      border-radius: 4px;
+      padding: 1.5rem 1rem 1.25rem;
+      box-shadow: var(--shadow-ballot);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 250px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      user-select: none;
+      background-image: radial-gradient(#eceae4 0.75px, transparent 0.75px);
+      background-size: 12px 12px;
+    }
+
+    .ballot-slip:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.14);
+      border-color: var(--accent);
+    }
+
+    .ballot-slip.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4), 0 12px 24px rgba(0,0,0,0.15);
+      background-color: #f0f7ff;
+    }
+
+    .ballot-letter {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #000000;
+      line-height: 1.1;
+      margin: 1rem 0;
+      text-align: center;
+      letter-spacing: -0.03em;
+    }
+
+    .ballot-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #111827;
+      text-align: center;
+      line-height: 1.35;
+      margin-top: auto;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 0.75rem;
+      width: 100%;
+    }
+
+    .ballot-category-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .ballot-action-btn {
+      margin-top: 0.75rem;
+      width: 100%;
+      padding: 0.45rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .ballot-slip:hover .ballot-action-btn {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    /* Blank Slip Special Style */
+    .ballot-slip.blank-slip {
+      border-style: dashed;
+      background: #f8fafc;
+    }
+    .ballot-slip.blank-slip .ballot-letter {
+      font-size: 1.8rem;
+      color: #64748b;
+    }
+
+    /* Voting Modal & Envelope Animation */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover { color: #ffffff; }
+
+    .modal-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Envelope Visual */
+    .envelope-box {
+      width: 240px;
+      height: 150px;
+      background: #1e3a8a;
+      border-radius: 8px;
+      position: relative;
+      margin: 1.5rem 0 1rem;
+      box-shadow: 0 8px 16px rgba(30, 58, 138, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      overflow: hidden;
+      border: 2px solid #3b82f6;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-left: 120px solid transparent;
+      border-right: 120px solid transparent;
+      border-top: 70px solid #2563eb;
+    }
+
+    .envelope-seal {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      background: #d97706;
+      border-radius: 50%;
+      top: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      border: 2px solid #fef3c7;
+    }
+
+    .envelope-label {
+      position: absolute;
+      bottom: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #bfdbfe;
+    }
+
+    .modal-chosen-slip {
+      background: var(--ballot-paper);
+      border: 2px solid #111827;
+      padding: 1rem 1.5rem;
+      border-radius: 6px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1rem;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .modal-chosen-letter {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #000;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-chosen-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .ip-warning-box {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      font-size: 0.88rem;
+      text-align: right;
+    }
+
+    .ip-warning-box.blocked {
+      background: #fee2e2;
+      border: 1px solid #f87171;
+      color: #991b1b;
+    }
+
+    .ip-warning-box.clean {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #166534;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Success Card */
+    .success-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      max-width: 650px;
+      margin: 2rem auto;
+    }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: #dcfce7;
+      color: var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin: 0 auto 1.25rem;
+    }
+
+    .success-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .success-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .receipt-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      text-align: right;
+      font-size: 0.9rem;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.35rem 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .receipt-row:last-child { border-bottom: none; }
+
+    .receipt-label { color: var(--text-muted); }
+    .receipt-value { font-weight: 700; color: var(--text); }
+
+    .success-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Admin Dashboard */
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-title-area h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .admin-title-area p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .admin-toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .kpi-value {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    .kpi-subtext {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    /* Knesset Chamber Visualizer */
+    .knesset-section {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .knesset-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .knesset-section-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .knesset-diagram-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .knesset-arch-canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .majority-tracker {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 1rem;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .majority-badge {
+      background: #e2e8f0;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+
+    /* Results Table */
+    .results-table-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+
+    .results-table-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .results-table-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table.results-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 0.92rem;
+    }
+
+    table.results-table th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 0.85rem 1rem;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    table.results-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    table.results-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .mini-ballot-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      padding: 0.2rem 0.6rem;
+      background: #ffffff;
+      border: 1.5px solid #111827;
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 1.15rem;
+      color: #000;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .party-title-col {
+      font-weight: 600;
+    }
+
+    .status-tag {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .status-tag.passed {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-tag.failed {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .mandates-count {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    .percent-bar-wrap {
+      width: 120px;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .percent-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    /* Share Modal */
+    .share-options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.75rem;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+
+    .share-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 0.5rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      gap: 0.35rem;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .share-btn.whatsapp:hover { background: #25d366; color: #fff; border-color: #25d366; }
+    .share-btn.telegram:hover { background: #0088cc; color: #fff; border-color: #0088cc; }
+    .share-btn.twitter:hover { background: #1da1f2; color: #fff; border-color: #1da1f2; }
+    .share-btn.facebook:hover { background: #1877f2; color: #fff; border-color: #1877f2; }
+
+    .share-link-input-group {
+      display: flex;
+      width: 100%;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .share-link-input-group input {
+      flex: 1;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: #f8fafc;
+      direction: ltr;
+      text-align: left;
+    }
+
+    /* QR Code Display */
+    .qr-container {
+      margin: 1rem auto;
+      padding: 0.75rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 999;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer {
+      background: #091a30;
+      color: #94a3b8;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      text-align: center;
+      border-top: 1px solid #1e293b;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header { padding: 0.85rem 1rem; }
+      .header-container { flex-direction: column; align-items: stretch; }
+      .nav-tabs { justify-content: center; }
+      .ballots-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.85rem; }
+      .ballot-slip { min-height: 210px; padding: 1rem 0.75rem; }
+      .ballot-letter { font-size: 2.8rem; margin: 0.5rem 0; }
+      .ballot-name { font-size: 0.82rem; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="emblem">🗳️</div>
+        <div class="title-group">
+          <h1>מערכת הבחירות הדיגיטלית | קלפי אינטרנטית</h1>
+          <p>הצבעה חשאית ומאובטחת לפי פתקי ההצבעה הרשמיים בישראל</p>
+        </div>
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchView('voter')" id="tab-voter">
+          <span>🗳️</span> קלפי לבוחר
+        </button>
+        <button class="tab-btn" onclick="switchView('admin')" id="tab-admin">
+          <span>📊</span> לוח מנהל הבחירות
+        </button>
+        <button class="tab-btn" onclick="openShareModal()" id="tab-share">
+          <span>🔗</span> שתף קישור
+        </button>
+        <button class="tab-btn" onclick="switchView('iptest')" id="tab-iptest">
+          <span>🧪</span> בדיקת IP
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Status & IP Indicator Bar -->
+  <div class="status-bar">
+    <div class="status-bar-container">
+      <div>
+        <span>מצב קלפי: <strong>פעילה ומאובטחת</strong></span>
+        <span style="margin: 0 0.5rem;">|</span>
+        <span>שיטת חישוב מנדטים: <strong>חוק בדר-עופר (120 מנדטים)</strong></span>
+        <span style="margin: 0 0.5rem;">|</span>
+        <span>אחוז חסימה: <strong>3.25%</strong></span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span>כתובת IP זוהתה:</span>
+        <span class="ip-badge" id="current-ip-display">192.168.1.101</span>
+        <span class="voter-status-pill can-vote" id="ip-status-pill">✓ רשאי להצביע</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- 1. VOTER VIEW -->
+    <section id="view-voter" class="view-section active">
+      <div class="hero-instructions">
+        <div class="instructions-text">
+          <h2>שלום בוחר/ת! בחר/י את פתק ההצבעה שלך</h2>
+          <p>לחץ/י על הפתק המתאים מתוך מגש הפתקים בקלפי. כל כתובת IP רשאית להצביע פעם אחת בלבד.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-outline" onclick="openShareModal()">
+            <span>🔗</span> שתף אתר
+          </button>
+          <button class="btn btn-primary" onclick="switchView('admin')">
+            <span>📊</span> צפה בתוצאות האמת
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter & Search Bar -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <input type="text" id="voter-search" placeholder="חפש לפי אותיות (למשל: מחל, פה, אמת) או שם המפלגה..." oninput="filterBallots()">
+          <span class="search-icon">🔍</span>
+        </div>
+        <div class="filter-pills">
+          <button class="pill active" onclick="setCategoryFilter('all', this)">כל הפתקים (20)</button>
+          <button class="pill" onclick="setCategoryFilter('knesset', this)">מפלגות כנסת</button>
+          <button class="pill" onclick="setCategoryFilter('new', this)">רשימות חדשות</button>
+          <button class="pill" onclick="setCategoryFilter('blank', this)">פתק לבן</button>
+        </div>
+      </div>
+
+      <div class="ballots-tray-title">
+        <span>📋</span> מגש פתקי ההצבעה (לחץ על פתק להטלה למעטפה):
+      </div>
+
+      <!-- Ballot Slips Grid -->
+      <div class="ballots-grid" id="ballots-grid">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </section>
+
+    <!-- 2. VOTER SUCCESS VIEW -->
+    <section id="view-success" class="view-section">
+      <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h2 class="success-title">הצבעתך נקלטה בהצלחה בקלפי!</h2>
+        <p class="success-subtitle">הפתק שבחרת שולשל למעטפה החשאית ונרשם כחוק במערכת הבחירות.</p>
+
+        <div class="receipt-box">
+          <div class="receipt-row">
+            <span class="receipt-label">מספר אסמכתא ייחודי:</span>
+            <span class="receipt-value" id="receipt-id">VOTE-78921-ISR</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">כתובת IP שנרשמה:</span>
+            <span class="receipt-value" id="receipt-ip">192.168.1.101</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">שעת הצבעה:</span>
+            <span class="receipt-value" id="receipt-time">14/10/2026 21:00</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">סטטוס זכות הצבעה ל-IP זה:</span>
+            <span class="receipt-value" style="color: var(--danger);">מוצתה (הצבעה חד-פעמית)</span>
+          </div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          רוצה שהקול של חבריך ישפיע גם? שתף איתם את הקישור לאתר הבחירות עכשיו!
+        </p>
+
+        <div class="success-actions">
+          <button class="btn btn-primary" onclick="openShareModal()">
+            <span>🔗</span> שתף קישור לאתר לחברים
+          </button>
+          <button class="btn btn-outline" onclick="switchView('admin')">
+            <span>📊</span> עבור ללוח תוצאות הבחירות
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ADMIN DASHBOARD VIEW -->
+    <section id="view-admin" class="view-section">
+      <div class="admin-header">
+        <div class="admin-title-area">
+          <h2>לוח הבקרה של מנהל הבחירות</h2>
+          <p>תוצאות אמת, אחוזי הצבעה, מעבר אחוז חסימה וחלוקת מנדטים לפי חוק בדר-עופר</p>
+        </div>
+        <div class="admin-toolbar">
+          <button class="btn btn-outline" onclick="openShareModal()">
+            <span>🔗</span> שתף קישור לקלפי
+          </button>
+          <button class="btn btn-outline" onclick="seedSampleVotes()">
+            <span>🎲</span> הזן 10,000 קולות דמה לבדיקה
+          </button>
+          <button class="btn btn-outline" onclick="exportResultsCSV()">
+            <span>📥</span> ייצוא נתונים ל-CSV
+          </button>
+          <button class="btn btn-danger" onclick="confirmResetVotes()">
+            <span>🗑️</span> איפוס נתוני קלפי
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">סה"כ מצביעים בקלפי</div>
+          <div class="kpi-value" id="kpi-total-votes">0</div>
+          <div class="kpi-subtext">קולות שהוטלו מכתובות IP ייחודיות</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">קולות כשרים</div>
+          <div class="kpi-value" id="kpi-valid-votes" style="color: var(--success);">0</div>
+          <div class="kpi-subtext" id="kpi-valid-pct">100% מסך הקולות</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">פתקים לבנים / פסולים</div>
+          <div class="kpi-value" id="kpi-invalid-votes" style="color: var(--text-muted);">0</div>
+          <div class="kpi-subtext" id="kpi-invalid-pct">0% מסך הקולות</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">אחוז החסימה (3.25%)</div>
+          <div class="kpi-value" id="kpi-threshold-votes">0</div>
+          <div class="kpi-subtext">קולות מינימום לכניסה לכנסת</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">מפלגות שעברו את החסימה</div>
+          <div class="kpi-value" id="kpi-passed-parties" style="color: var(--accent);">0</div>
+          <div class="kpi-subtext">מתוך 19 רשימות מתמודדות</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">מנדטים שחולקו</div>
+          <div class="kpi-value" id="kpi-total-seats" style="color: var(--gold);">120 / 120</div>
+          <div class="kpi-subtext">מלא לפי נוסחת בדר-עופר</div>
+        </div>
+      </div>
+
+      <!-- Knesset Chamber Semicircular Visualizer -->
+      <div class="knesset-section">
+        <div class="knesset-section-header">
+          <h3><span>🏛️</span> הדמיית מליאת הכנסת ה-26 (120 מושבים)</h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">צבעי מושבים מייצגים את הסיעות שזכו במנדטים</span>
+        </div>
+        <div class="knesset-diagram-container">
+          <canvas id="knesset-canvas" width="600" height="320" class="knesset-arch-canvas"></canvas>
+          <div class="majority-tracker">
+            <span>רוב קואליציוני נדרש: <strong>61 מנדטים</strong></span>
+            <span class="majority-badge" id="majority-status-text">המליאה מוכנה להרכבת ממשלה</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Results Table -->
+      <div class="results-table-card">
+        <div class="results-table-header">
+          <h3><span>📋</span> טבלת תוצאות הבחירות המפורטת וחלוקת המנדטים</h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">מעודכן בזמן אמת לכל קול שנוסף</span>
+        </div>
+        <div class="table-container">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">פתק</th>
+                <th>שם הרשימה והאותיות</th>
+                <th>מספר קולות</th>
+                <th>אחוז מהקולות הכשרים</th>
+                <th>מעבר אחוז חסימה</th>
+                <th>מנדטים (בדר-עופר)</th>
+                <th>שיעור בכנסת</th>
+                <th>התפלגות</th>
+              </tr>
+            </thead>
+            <tbody id="results-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. IP TEST & SIMULATION VIEW -->
+    <section id="view-iptest" class="view-section">
+      <div class="hero-instructions">
+        <div class="instructions-text">
+          <h2>סימולטור ובדיקת הגבלת הצבעה לפי IP</h2>
+          <p>במערכת זו כל כתובת IP יכולה להצביע פעם אחת בלבד. מסך זה מאפשר לבדוק את מנגנון החסימה, להחליף כתובות IP לבדיקה, או לאפס כתובת לצורך הדגמה.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-outline" onclick="generateRandomIP()">
+            <span>🎲</span> צור כתובת IP אקראית
+          </button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">כתובת ה-IP הנוכחית שלך</div>
+          <div class="kpi-value" style="font-size: 1.4rem; font-family: monospace;" id="tester-current-ip">192.168.1.101</div>
+          <div class="kpi-subtext" id="tester-ip-status">סטטוס: רשאי להצביע</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">סה"כ כתובות IP שהצביעו</div>
+          <div class="kpi-value" id="tester-total-ips">0</div>
+          <div class="kpi-subtext">רשומות במסד הנתונים</div>
+        </div>
+      </div>
+
+      <div class="results-table-card" style="margin-top: 1.5rem; padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">שנה כתובת IP פעילה לבדיקה:</h3>
+        <div style="display: flex; gap: 0.75rem; max-width: 500px; flex-wrap: wrap;">
+          <input type="text" id="manual-ip-input" placeholder="למשל: 10.0.0.45" style="flex: 1; padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: monospace;">
+          <button class="btn btn-primary" onclick="setManualIP()">החלף IP</button>
+          <button class="btn btn-outline" onclick="clearCurrentIPVote()">מחק הצבעה מ-IP נוכחי</button>
+        </div>
+      </div>
+
+      <div class="results-table-card" style="margin-top: 1.5rem;">
+        <div class="results-table-header">
+          <h3>יומן כתובות IP שהצביעו עד כה</h3>
+        </div>
+        <div class="table-container">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>כתובת IP</th>
+                <th>זמן הצבעה</th>
+                <th>מפלגה שנבחרה</th>
+                <th>פעולה</th>
+              </tr>
+            </thead>
+            <tbody id="ip-log-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- VOTING CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="vote-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>אישור הטלת פתק לקלפי</h3>
+        <button class="modal-close" onclick="closeVoteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+          בחרת בפתק ההצבעה הבא:
+        </p>
+
+        <!-- Selected Ballot Display -->
+        <div class="modal-chosen-slip" id="modal-chosen-slip">
+          <div class="modal-chosen-letter" id="modal-slip-letter">מחל</div>
+          <div class="modal-chosen-name" id="modal-slip-name">הליכוד</div>
+        </div>
+
+        <!-- Envelope Graphic -->
+        <div class="envelope-box">
+          <div class="envelope-flap"></div>
+          <div class="envelope-seal">🇮🇱</div>
+          <div class="envelope-label">מעטפת הצבעה חשאית - מדינת ישראל</div>
+        </div>
+
+        <!-- IP Status Verification in Modal -->
+        <div class="ip-warning-box clean" id="modal-ip-box">
+          <div><strong>אימות כתובת IP:</strong> <span id="modal-ip-text">192.168.1.101</span></div>
+          <div id="modal-ip-msg">✓ כתובת ה-IP מאומתת ולא הצביעה עדיין. הנך רשאי/ת להצביע.</div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          לתשומת לבך: לאחר השלשלת הפתק למעטפה, לא ניתן לשנות את הבחירה או להצביע שנית מכתובת IP זו.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeVoteModal()">ביטול ובחירה מחדש</button>
+        <button class="btn btn-primary" id="btn-confirm-vote" onclick="executeVote()">
+          <span>🗳️</span> אשר והטל למעטפה
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE LINK MODAL -->
+  <div class="modal-overlay" id="share-modal">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>שיתוף קישור לאתר הבחירות</h3>
+        <button class="modal-close" onclick="closeShareModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem;">
+          שתף/י את הקישור עם חברים, משפחה וברשתות החברתיות כדי שיצביעו וישפיעו!
+        </p>
+
+        <!-- Copy Link Input -->
+        <div class="share-link-input-group">
+          <input type="text" id="share-link-input" readonly value="https://elections.gov.il/vote">
+          <button class="btn btn-primary" onclick="copyShareLink()">
+            <span>📋</span> העתק
+          </button>
+        </div>
+
+        <!-- Social Share Buttons -->
+        <div class="share-options-grid">
+          <a class="share-btn whatsapp" id="share-whatsapp" href="#" target="_blank">
+            <span style="font-size: 1.4rem;">💬</span>
+            <span>וואטסאפ</span>
+          </a>
+          <a class="share-btn telegram" id="share-telegram" href="#" target="_blank">
+            <span style="font-size: 1.4rem;">✈️</span>
+            <span>טלגרם</span>
+          </a>
+          <a class="share-btn twitter" id="share-twitter" href="#" target="_blank">
+            <span style="font-size: 1.4rem;">🐦</span>
+            <span>טוויטר / X</span>
+          </a>
+          <a class="share-btn facebook" id="share-facebook" href="#" target="_blank">
+            <span style="font-size: 1.4rem;">📘</span>
+            <span>פייסבוק</span>
+          </a>
+        </div>
+
+        <!-- QR Code Display -->
+        <div style="margin-top: 1rem; text-align: center;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">
+            סריקה בנייד להצבעה מהירה:
+          </div>
+          <div class="qr-container" id="qr-code-box">
+            <!-- QR SVG generated here -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeShareModal()">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast-notification">
+    <span id="toast-icon">✓</span>
+    <span id="toast-message">הודעה</span>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div style="max-width: 1300px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <strong>מערכת הבחירות הדיגיטלית לישראל</strong> | פותח ככלי סימולציה וניהול קלפיות אינטרנטיות
+      </div>
+      <div>
+        <span>הגבלת 1 הצבעה ל-IP</span> &bull; 
+        <span>חלוקת 120 מנדטים בדר-עופר</span> &bull; 
+        <span>אחוז חסימה 3.25%</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // 1. Data Store
+    const PARTIES = [
+  {
+    "id": "mahal",
+    "letter": "מחל",
+    "name": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה",
+    "short": "הליכוד",
+    "color": "#1877f2",
+    "bloc": "right"
+  },
+  {
+    "id": "po",
+    "letter": "פה",
+    "name": "יש עתיד בראשות יאיר לפיד",
+    "short": "יש עתיד",
+    "color": "#00a3e0",
+    "bloc": "center_left"
+  },
+  {
+    "id": "ken",
+    "letter": "כן",
+    "name": "המחנה הממלכתי בהנהגת בני גנץ",
+    "short": "המחנה הממלכתי",
+    "color": "#002b49",
+    "bloc": "center_left"
+  },
+  {
+    "id": "tet",
+    "letter": "ט",
+    "name": "מפלגת הציונות הדתית בראשות בצלאל סמוטריץ'",
+    "short": "הציונות הדתית",
+    "color": "#e87722",
+    "bloc": "right"
+  },
+  {
+    "id": "bet",
+    "letter": "ב",
+    "name": "עוצמה יהודית בראשות איתמר בן גביר",
+    "short": "עוצמה יהודית",
+    "color": "#c8102e",
+    "bloc": "right"
+  },
+  {
+    "id": "shas",
+    "letter": "שס",
+    "name": "התאחדות הספרדים שומרי תורה תנועת ש\"ס",
+    "short": "ש\"ס",
+    "color": "#2c3e50",
+    "bloc": "right"
+  },
+  {
+    "id": "gimel",
+    "letter": "ג",
+    "name": "יהדות התורה והשבת אגודת ישראל - דגל התורה",
+    "short": "יהדות התורה",
+    "color": "#34495e",
+    "bloc": "right"
+  },
+  {
+    "id": "lamed",
+    "letter": "ל",
+    "name": "ישראל ביתנו בראשות אביגדור ליברמן",
+    "short": "ישראל ביתנו",
+    "color": "#005596",
+    "bloc": "right"
+  },
+  {
+    "id": "emet",
+    "letter": "אמת",
+    "name": "הדמוקרטים (מפלגת העבודה ומרצ) בראשות יאיר גולן",
+    "short": "הדמוקרטים",
+    "color": "#008850",
+    "bloc": "center_left"
+  },
+  {
+    "id": "am",
+    "letter": "עם",
+    "name": "רע\"ם - הרשימה הערבית המאוחדת",
+    "short": "רע\"ם",
+    "color": "#007a3d",
+    "bloc": "arab"
+  },
+  {
+    "id": "um",
+    "letter": "ום",
+    "name": "חד\"ש - תע\"ל בראשות איימן עודה ואחמד טיבי",
+    "short": "חד\"ש-תע\"ל",
+    "color": "#d9232a",
+    "bloc": "arab"
+  },
+  {
+    "id": "dalet",
+    "letter": "ד",
+    "name": "בל\"ד - אלתג'מוע אלדמוקרטי",
+    "short": "בל\"ד",
+    "color": "#f58220",
+    "bloc": "arab"
+  },
+  {
+    "id": "rak",
+    "letter": "רק",
+    "name": "ביחד בראשות נפתלי בנט",
+    "short": "ביחד",
+    "color": "#2563eb",
+    "bloc": "center_left"
+  },
+  {
+    "id": "derech",
+    "letter": "דרך",
+    "name": "ישר בראשות גדי איזנקוט",
+    "short": "ישר",
+    "color": "#4f46e5",
+    "bloc": "center_left"
+  },
+  {
+    "id": "ni",
+    "letter": "ני",
+    "name": "מפלגת נעם בראשות אבי מעוז",
+    "short": "נעם",
+    "color": "#854d0e",
+    "bloc": "right"
+  },
+  {
+    "id": "day",
+    "letter": "די",
+    "name": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה",
+    "short": "המילואימניקים",
+    "color": "#0d9488",
+    "bloc": "other"
+  },
+  {
+    "id": "kach",
+    "letter": "ך",
+    "name": "עמך ישראל בראשות עופר וינטר",
+    "short": "עמך ישראל",
+    "color": "#15803d",
+    "bloc": "right"
+  },
+  {
+    "id": "yod",
+    "letter": "י",
+    "name": "ישראל תחילה בראשות שרן השכל",
+    "short": "ישראל תחילה",
+    "color": "#7e22ce",
+    "bloc": "other"
+  },
+  {
+    "id": "zach",
+    "letter": "זך",
+    "name": "צעירים בוערים",
+    "short": "צעירים בוערים",
+    "color": "#ea580c",
+    "bloc": "other"
+  },
+  {
+    "id": "blank",
+    "letter": "פתק לבן",
+    "name": "פתק לבן (הצבעת מחאה / קול נמנע)",
+    "short": "פתק לבן",
+    "color": "#9ca3af",
+    "bloc": "invalid"
+  }
+];
+
+    // State Variables
+    let currentIP = "192.168.1.101";
+    let selectedParty = null;
+    let categoryFilter = "all";
+    let autoRefreshTimer = null;
+
+    // Local Storage Keys
+    const STORAGE_KEY_VOTES = "il_election_votes";
+    const STORAGE_KEY_IPS = "il_election_voted_ips";
+    const STORAGE_KEY_CURRENT_IP = "il_election_simulated_ip";
+
+    // Initialize Database
+    function getStoredVotes() {
+      const raw = localStorage.getItem(STORAGE_KEY_VOTES);
+      if (!raw) return {};
+      try { return JSON.parse(raw); } catch (e) { return {}; }
+    }
+
+    function saveVotes(votes) {
+      localStorage.setItem(STORAGE_KEY_VOTES, JSON.stringify(votes));
+    }
+
+    function getVotedIPs() {
+      const raw = localStorage.getItem(STORAGE_KEY_IPS);
+      if (!raw) return {};
+      try { return JSON.parse(raw); } catch (e) { return {}; }
+    }
+
+    function saveVotedIPs(ips) {
+      localStorage.setItem(STORAGE_KEY_IPS, JSON.stringify(ips));
+    }
+
+    // Check if IP has already voted
+    function hasCurrentIPVoted() {
+      const ips = getVotedIPs();
+      return !!ips[currentIP];
+    }
+
+    // Initialize Application
+    
+    // Dual Mode (Server API / Offline LocalStorage)
+    const isServerMode = window.location.protocol.startsWith('http');
+
+    async function checkServerIP() {
+      if (isServerMode) {
+        try {
+          const res = await fetch('/api/ip');
+          if (res.ok) {
+            const data = await res.json();
+            currentIP = data.ip;
+            if (data.has_voted) {
+              const votedIPs = getVotedIPs();
+              votedIPs[currentIP] = { timestamp: 'שרת', partyName: 'נרשם בשרת', partyLetter: '✓' };
+              saveVotedIPs(votedIPs);
+            }
+            updateIPStatusUI();
+          }
+        } catch (e) {
+          console.log('Running in client offline mode');
+        }
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      checkServerIP();
+      // Setup current IP from storage or default
+      const savedIP = localStorage.getItem(STORAGE_KEY_CURRENT_IP);
+      if (savedIP) {
+        currentIP = savedIP;
+      } else {
+        // Set a random user IP like 192.168.1.X or 84.108.X.X
+        currentIP = "192.168.1." + Math.floor(Math.random() * 150 + 20);
+        localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
+      }
+
+      // Check URL params for direct views
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("view") === "admin") {
+        switchView("admin");
+      } else if (params.get("view") === "iptest") {
+        switchView("iptest");
+      }
+
+      updateIPStatusUI();
+      renderBallotCards();
+      setupShareLinks();
+      generateQRCodeSVG();
+      refreshAdminResults();
+
+      // Listen for hash changes or view changes
+      setInterval(checkIPStatusChange, 2000);
+    });
+
+    function checkIPStatusChange() {
+      updateIPStatusUI();
+    }
+
+    // Update IP Status UI
+    function updateIPStatusUI() {
+      const ipDisplay = document.getElementById("current-ip-display");
+      const statusPill = document.getElementById("ip-status-pill");
+      const testerIP = document.getElementById("tester-current-ip");
+      const testerStatus = document.getElementById("tester-ip-status");
+      const testerTotalIPs = document.getElementById("tester-total-ips");
+
+      if (ipDisplay) ipDisplay.textContent = currentIP;
+      if (testerIP) testerIP.textContent = currentIP;
+
+      const voted = hasCurrentIPVoted();
+      const votedIPs = getVotedIPs();
+      if (testerTotalIPs) testerTotalIPs.textContent = Object.keys(votedIPs).length;
+
+      if (voted) {
+        if (statusPill) {
+          statusPill.className = "voter-status-pill voted";
+          statusPill.innerHTML = "⛔ כבר הצבעת מ-IP זה";
+        }
+        if (testerStatus) {
+          testerStatus.textContent = "סטטוס: הצבעה כבר בוצעה (חסום להצבעה נוספת)";
+          testerStatus.style.color = "var(--danger)";
+        }
+      } else {
+        if (statusPill) {
+          statusPill.className = "voter-status-pill can-vote";
+          statusPill.innerHTML = "✓ רשאי להצביע";
+        }
+        if (testerStatus) {
+          testerStatus.textContent = "סטטוס: רשאי להצביע (כתובת נקייה)";
+          testerStatus.style.color = "var(--success)";
+        }
+      }
+
+      renderIPLogs();
+    }
+
+    // Switch Views
+    function switchView(viewName) {
+      document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+
+      const targetSec = document.getElementById("view-" + viewName);
+      const targetTab = document.getElementById("tab-" + viewName);
+
+      if (targetSec) targetSec.classList.add("active");
+      if (targetTab) targetTab.classList.add("active");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (viewName === "admin") {
+        refreshAdminResults();
+      } else if (viewName === "iptest") {
+        updateIPStatusUI();
+      }
+    }
+
+    // Render Ballot Cards Grid
+    function renderBallotCards() {
+      const grid = document.getElementById("ballots-grid");
+      if (!grid) return;
+
+      const searchTerm = (document.getElementById("voter-search")?.value || "").trim().toLowerCase();
+      grid.innerHTML = "";
+
+      const filtered = PARTIES.filter(p => {
+        // Category filter
+        if (categoryFilter === "knesset" && (p.id === "blank" || p.bloc === "other")) return false;
+        if (categoryFilter === "new" && (p.bloc !== "other" && p.id !== "rak" && p.id !== "derech")) return false;
+        if (categoryFilter === "blank" && p.id !== "blank") return false;
+
+        // Search text
+        if (searchTerm) {
+          const matchLetter = p.letter.toLowerCase().includes(searchTerm);
+          const matchName = p.name.toLowerCase().includes(searchTerm);
+          const matchShort = p.short.toLowerCase().includes(searchTerm);
+          return matchLetter || matchName || matchShort;
+        }
+        return true;
+      });
+
+      filtered.forEach(party => {
+        const card = document.createElement("div");
+        card.className = "ballot-slip" + (party.id === "blank" ? " blank-slip" : "");
+        card.onclick = () => openVoteModal(party);
+
+        let categoryText = "מפלגת כנסת";
+        if (party.id === "blank") categoryText = "פתק לבן";
+        else if (party.bloc === "other" || party.id === "rak" || party.id === "derech") categoryText = "רשימה חדשה";
+
+        card.innerHTML = `
+          <div class="ballot-category-badge">${categoryText}</div>
+          <div class="ballot-letter">${party.letter}</div>
+          <div class="ballot-name">${party.name}</div>
+          <button class="ballot-action-btn">בחר פתק זה ↵</button>
+        `;
+        grid.appendChild(card);
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: #fff; border-radius: 12px; border: 1px solid var(--border);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+            <h3 style="color: var(--primary);">לא נמצאו פתקי הצבעה מתאימים</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">נסה לחפש אותיות אחרות או נקה את שדה החיפוש</p>
+          </div>
+        `;
+      }
+    }
+
+    function filterBallots() {
+      renderBallotCards();
+    }
+
+    function setCategoryFilter(cat, btn) {
+      categoryFilter = cat;
+      document.querySelectorAll(".filter-pills .pill").forEach(p => p.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderBallotCards();
+    }
+
+    // Open Vote Confirmation Modal
+    function openVoteModal(party) {
+      selectedParty = party;
+      const modal = document.getElementById("vote-modal");
+      const slipLetter = document.getElementById("modal-slip-letter");
+      const slipName = document.getElementById("modal-slip-name");
+      const modalIP = document.getElementById("modal-ip-text");
+      const modalBox = document.getElementById("modal-ip-box");
+      const modalMsg = document.getElementById("modal-ip-msg");
+      const confirmBtn = document.getElementById("btn-confirm-vote");
+
+      slipLetter.textContent = party.letter;
+      slipName.textContent = party.name;
+      modalIP.textContent = currentIP;
+
+      const alreadyVoted = hasCurrentIPVoted();
+      if (alreadyVoted) {
+        modalBox.className = "ip-warning-box blocked";
+        modalMsg.innerHTML = "⛔ <strong>הצבעה חסומה:</strong> כתובת ה-IP שלך כבר הצביעה בעבר במערכת זו. לא ניתן להצביע יותר מפעם אחת מאותו IP.";
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = "0.5";
+        confirmBtn.style.cursor = "not-allowed";
+      } else {
+        modalBox.className = "ip-warning-box clean";
+        modalMsg.innerHTML = "✓ כתובת ה-IP מאומתת ולא הצביעה עדיין. הנך רשאי/ת להצביע.";
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = "1";
+        confirmBtn.style.cursor = "pointer";
+      }
+
+      modal.classList.add("active");
+    }
+
+    function closeVoteModal() {
+      document.getElementById("vote-modal").classList.remove("active");
+      selectedParty = null;
+    }
+
+    // Execute Vote
+    function executeVote() {
+      if (!selectedParty) return;
+
+      if (hasCurrentIPVoted()) {
+        showToast("⛔ כתובת ה-IP שלך כבר הצביעה במערכת זו!", "error");
+        return;
+      }
+
+      // Record Vote
+      const votes = getStoredVotes();
+      votes[selectedParty.id] = (votes[selectedParty.id] || 0) + 1;
+      saveVotes(votes);
+
+      // Record IP
+      const now = new Date();
+      const timeStr = now.toLocaleDateString("he-IL") + " " + now.toLocaleTimeString("he-IL");
+      const votedIPs = getVotedIPs();
+      votedIPs[currentIP] = {
+        timestamp: timeStr,
+        partyId: selectedParty.id,
+        partyName: selectedParty.name,
+        partyLetter: selectedParty.letter
+      };
+      saveVotedIPs(votedIPs);
+
+      // Close modal
+      closeVoteModal();
+      updateIPStatusUI();
+
+      // Show receipt in success screen
+      const receiptId = "VOTE-" + Math.floor(10000 + Math.random() * 90000) + "-ISR";
+      document.getElementById("receipt-id").textContent = receiptId;
+      document.getElementById("receipt-ip").textContent = currentIP;
+      document.getElementById("receipt-time").textContent = timeStr;
+
+      showToast("✓ הצבעתך נקלטה בהצלחה בקלפי!", "success");
+      switchView("success");
+    }
+
+    // ==============================================================
+    // BADER-OFER KNESSET SEAT ALLOCATION ALGORITHM (חוק בדר-עופר)
+    // ==============================================================
+    function calculateBaderOferResults() {
+      const votes = getStoredVotes();
+      const totalBallots = Object.values(votes).reduce((a, b) => a + b, 0);
+      const blankVotes = votes["blank"] || 0;
+      const validVotes = totalBallots - blankVotes;
+
+      const thresholdPct = 3.25;
+      const thresholdVotes = validVotes > 0 ? (validVotes * thresholdPct / 100.0) : 0;
+
+      // 1. Qualifying Parties (exclude blank slip and check >= threshold)
+      const qualifying = [];
+      const nonQualifying = [];
+
+      PARTIES.forEach(party => {
+        const count = votes[party.id] || 0;
+        const pctOfValid = validVotes > 0 ? (count / validVotes * 100) : 0;
+        const isBlank = (party.id === "blank");
+
+        const data = {
+          ...party,
+          votes: count,
+          pct: pctOfValid,
+          passed: (!isBlank && validVotes > 0 && count >= thresholdVotes),
+          seats: 0
+        };
+
+        if (!isBlank && data.passed) {
+          qualifying.push(data);
+        } else {
+          nonQualifying.push(data);
+        }
+      });
+
+      // 2. Seat Allocation (Total seats = 120)
+      const TOTAL_SEATS = 120;
+      if (qualifying.length > 0 && validVotes > 0) {
+        const qualifyingVotesSum = qualifying.reduce((sum, p) => sum + p.votes, 0);
+        const generalQuota = qualifyingVotesSum / TOTAL_SEATS;
+
+        // Stage A: Initial integer quota division
+        let allocatedSeats = 0;
+        qualifying.forEach(p => {
+          p.seats = Math.floor(p.votes / generalQuota);
+          allocatedSeats += p.seats;
+        });
+
+        // Stage B: Bader-Ofer surplus allocation
+        const remainingSeats = TOTAL_SEATS - allocatedSeats;
+        for (let i = 0; i < remainingSeats; i++) {
+          let bestParty = null;
+          let highestQuotient = -1;
+
+          qualifying.forEach(p => {
+            const quotient = p.votes / (p.seats + 1);
+            if (quotient > highestQuotient) {
+              highestQuotient = quotient;
+              bestParty = p;
+            }
+          });
+
+          if (bestParty) {
+            bestParty.seats += 1;
+          }
+        }
+      }
+
+      // Combine results sorted by mandates descending, then votes descending
+      const allResults = [...qualifying, ...nonQualifying].sort((a, b) => {
+        if (b.seats !== a.seats) return b.seats - a.seats;
+        return b.votes - a.votes;
+      });
+
+      return {
+        totalBallots,
+        validVotes,
+        blankVotes,
+        thresholdVotes: Math.ceil(thresholdVotes),
+        qualifyingCount: qualifying.length,
+        results: allResults
+      };
+    }
+
+    // Render Admin Results & Knesset Canvas
+    function refreshAdminResults() {
+      const data = calculateBaderOferResults();
+
+      // Update KPIs
+      document.getElementById("kpi-total-votes").textContent = data.totalBallots.toLocaleString();
+      document.getElementById("kpi-valid-votes").textContent = data.validVotes.toLocaleString();
+      document.getElementById("kpi-invalid-votes").textContent = data.blankVotes.toLocaleString();
+
+      const validRatio = data.totalBallots > 0 ? (data.validVotes / data.totalBallots * 100).toFixed(1) : "100";
+      const invalidRatio = data.totalBallots > 0 ? (data.blankVotes / data.totalBallots * 100).toFixed(1) : "0";
+      document.getElementById("kpi-valid-pct").textContent = validRatio + "% מסך הקולות";
+      document.getElementById("kpi-invalid-pct").textContent = invalidRatio + "% מסך הקולות";
+
+      document.getElementById("kpi-threshold-votes").textContent = data.thresholdVotes.toLocaleString();
+      document.getElementById("kpi-passed-parties").textContent = data.qualifyingCount;
+
+      // Table Render
+      const tbody = document.getElementById("results-table-body");
+      if (tbody) {
+        tbody.innerHTML = "";
+        data.results.forEach(p => {
+          const tr = document.createElement("tr");
+          const isBlank = (p.id === "blank");
+
+          const statusHtml = isBlank 
+            ? `<span class="status-tag failed">קול פסול / נמנע</span>`
+            : (p.passed 
+                ? `<span class="status-tag passed">✓ עברה (${p.pct.toFixed(2)}%)</span>` 
+                : `<span class="status-tag failed">לא עברה (${p.pct.toFixed(2)}%)</span>`);
+
+          const mandatePct = (p.seats / 120 * 100).toFixed(1);
+          const barWidth = Math.min(100, Math.max(2, p.pct * 3));
+
+          tr.innerHTML = `
+            <td>
+              <span class="mini-ballot-badge">${p.letter}</span>
+            </td>
+            <td class="party-title-col">
+              <div style="font-weight: 700; color: var(--text);">${p.short}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">${p.name}</div>
+            </td>
+            <td style="font-weight: 700; font-family: monospace;">${p.votes.toLocaleString()}</td>
+            <td>${isBlank ? "-" : p.pct.toFixed(2) + "%"}</td>
+            <td>${statusHtml}</td>
+            <td><span class="mandates-count" style="color: ${p.seats > 0 ? 'var(--primary)' : 'var(--text-muted)'};">${p.seats}</span></td>
+            <td>${p.seats > 0 ? mandatePct + "%" : "-"}</td>
+            <td>
+              <div class="percent-bar-wrap">
+                <div class="percent-bar-fill" style="width: ${barWidth}%; background: ${p.color};"></div>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Draw Knesset Seating Diagram
+      drawKnessetArch(data.results.filter(p => p.seats > 0));
+    }
+
+    // Draw Knesset Semicircle Canvas
+    function drawKnessetArch(partiesWithSeats) {
+      const canvas = document.getElementById("knesset-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height - 30;
+
+      // Arc radii for rows of seats
+      const rows = [
+        { count: 18, radius: 95 },
+        { count: 24, radius: 135 },
+        { count: 30, radius: 175 },
+        { count: 48, radius: 215 }
+      ];
+
+      // Build seat list ordered by coalition/party
+      const seatColors = [];
+      partiesWithSeats.forEach(p => {
+        for (let i = 0; i < p.seats; i++) {
+          seatColors.push(p.color);
+        }
+      });
+
+      // Fill remaining if less than 120
+      while (seatColors.length < 120) {
+        seatColors.push("#cbd5e1");
+      }
+
+      let currentSeatIndex = 0;
+      rows.forEach(row => {
+        const angleStep = Math.PI / (row.count + 1);
+        for (let j = 1; j <= row.count; j++) {
+          const angle = Math.PI - (j * angleStep);
+          const x = centerX + row.radius * Math.cos(angle);
+          const y = centerY - row.radius * Math.sin(angle);
+
+          const color = seatColors[currentSeatIndex] || "#cbd5e1";
+          currentSeatIndex++;
+
+          // Draw seat circle
+          ctx.beginPath();
+          ctx.arc(x, y, 7, 0, 2 * Math.PI);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = "#ffffff";
+          ctx.stroke();
+        }
+      });
+
+      // Draw podium / speaker table in center
+      ctx.beginPath();
+      ctx.arc(centerX, centerY - 10, 24, Math.PI, 2 * Math.PI);
+      ctx.fillStyle = "#0f172a";
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("יו"ר", centerX, centerY - 14);
+    }
+
+    // ==============================================================
+    // IP SIMULATION & TESTING TOOLS
+    // ==============================================================
+    function generateRandomIP() {
+      const octet1 = [84, 147, 79, 109, 192, 10][Math.floor(Math.random() * 6)];
+      const octet2 = Math.floor(Math.random() * 254) + 1;
+      const octet3 = Math.floor(Math.random() * 254) + 1;
+      const octet4 = Math.floor(Math.random() * 254) + 1;
+      const newIP = `${octet1}.${octet2}.${octet3}.${octet4}`;
+
+      currentIP = newIP;
+      localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
+      updateIPStatusUI();
+      showToast(`כתובת IP הוחלפה ל: ${newIP}`, "success");
+    }
+
+    function setManualIP() {
+      const val = (document.getElementById("manual-ip-input")?.value || "").trim();
+      if (!val) {
+        showToast("נא להזין כתובת IP תקינה", "error");
+        return;
+      }
+      currentIP = val;
+      localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
+      updateIPStatusUI();
+      showToast(`כתובת IP עודכנה ל: ${val}`, "success");
+    }
+
+    function clearCurrentIPVote() {
+      const votedIPs = getVotedIPs();
+      if (votedIPs[currentIP]) {
+        const partyId = votedIPs[currentIP].partyId;
+        delete votedIPs[currentIP];
+        saveVotedIPs(votedIPs);
+
+        // Deduct 1 vote from party
+        const votes = getStoredVotes();
+        if (votes[partyId] && votes[partyId] > 0) {
+          votes[partyId] -= 1;
+          saveVotes(votes);
+        }
+
+        updateIPStatusUI();
+        refreshAdminResults();
+        showToast("הצבעת כתובת IP זו נמחקה בהצלחה!", "success");
+      } else {
+        showToast("כתובת זו לא הצביעה מעולם", "info");
+      }
+    }
+
+    function renderIPLogs() {
+      const tbody = document.getElementById("ip-log-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const votedIPs = getVotedIPs();
+      const entries = Object.entries(votedIPs);
+
+      if (entries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">אין עדיין הצבעות רשומות במערכת</td></tr>`;
+        return;
+      }
+
+      entries.forEach(([ip, record]) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="font-family: monospace; font-weight: 700;">${ip}</td>
+          <td>${record.timestamp || "-"}</td>
+          <td><span class="mini-ballot-badge" style="font-size: 0.9rem; padding: 2px 6px;">${record.partyLetter || ""}</span> ${record.partyName || record.partyId}</td>
+          <td>
+            <button class="btn btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.78rem;" onclick="removeSingleIP('${ip}')">מחק הצבעה</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function removeSingleIP(ip) {
+      const votedIPs = getVotedIPs();
+      if (votedIPs[ip]) {
+        const pId = votedIPs[ip].partyId;
+        delete votedIPs[ip];
+        saveVotedIPs(votedIPs);
+
+        const votes = getStoredVotes();
+        if (votes[pId] && votes[pId] > 0) {
+          votes[pId] -= 1;
+          saveVotes(votes);
+        }
+
+        updateIPStatusUI();
+        refreshAdminResults();
+        showToast(`הצבעת IP ${ip} נמחקה`, "info");
+      }
+    }
+
+    // Seed Sample Realistic Israeli Votes
+    function seedSampleVotes() {
+      if (!confirm("פעולה זו תזריק 10,000 קולות דמה ריאליסטיים להמחשת חישוב המנדטים וחוק בדר-עופר. להמשיך?")) return;
+
+      const votes = {
+        "mahal": 2450,
+        "po": 1820,
+        "ken": 1150,
+        "tet": 780,
+        "bet": 820,
+        "shas": 840,
+        "gimel": 610,
+        "lamed": 550,
+        "emet": 430,
+        "am": 380,
+        "um": 370,
+        "dalet": 120, // מתחת לחסימה
+        "rak": 250,   // מתחת לחסימה
+        "derech": 190,// מתחת לחסימה
+        "blank": 110  // פתק לבן
+      };
+
+      saveVotes(votes);
+      refreshAdminResults();
+      showToast("✓ 10,000 קולות דמה הוזרקו בהצלחה לקלפי!", "success");
+    }
+
+    function confirmResetVotes() {
+      if (!confirm("האם אתה בטוח שברצונך לאפס את כל תוצאות הבחירות ואת רשימת ה-IP שהצביעו?")) return;
+      localStorage.removeItem(STORAGE_KEY_VOTES);
+      localStorage.removeItem(STORAGE_KEY_IPS);
+      updateIPStatusUI();
+      refreshAdminResults();
+      showToast("נתוני הקלפי אופסו לחלוטין!", "info");
+    }
+
+    function exportResultsCSV() {
+      const data = calculateBaderOferResults();
+      let csv = "אותיות,שם הרשימה,מספר קולות,אחוז מהכשרים,עברה אחוז חסימה,מנדטים\n";
+
+      data.results.forEach(r => {
+        csv += `"${r.letter}","${r.name}",${r.votes},"${r.pct.toFixed(2)}%",${r.passed ? "כן" : "לא"},${r.seats}\n`;
+      });
+
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "election_results_israel.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("קובץ CSV הורד בהצלחה!", "success");
+    }
+
+    // ==============================================================
+    // SHARE LINK MODAL & GENERATOR
+    // ==============================================================
+    function openShareModal() {
+      const modal = document.getElementById("share-modal");
+      modal.classList.add("active");
+      setupShareLinks();
+    }
+
+    function closeShareModal() {
+      document.getElementById("share-modal").classList.remove("active");
+    }
+
+    function setupShareLinks() {
+      const currentUrl = window.location.href.split("#")[0].split("?")[0];
+      const input = document.getElementById("share-link-input");
+      if (input) input.value = currentUrl;
+
+      const shareText = encodeURIComponent("הצבעתי עכשיו בבחירות הדיגיטליות! בואו לבחור מתוך רשימת המפלגות הרשמיות בישראל ולהשפיע: " + currentUrl);
+
+      // WhatsApp
+      const waBtn = document.getElementById("share-whatsapp");
+      if (waBtn) waBtn.href = "https://api.whatsapp.com/send?text=" + shareText;
+
+      // Telegram
+      const tgBtn = document.getElementById("share-telegram");
+      if (tgBtn) tgBtn.href = "https://t.me/share/url?url=" + encodeURIComponent(currentUrl) + "&text=" + encodeURIComponent("בחירות דיגיטליות בישראל - בואו להצביע!");
+
+      // Twitter / X
+      const twBtn = document.getElementById("share-twitter");
+      if (twBtn) twBtn.href = "https://twitter.com/intent/tweet?text=" + shareText;
+
+      // Facebook
+      const fbBtn = document.getElementById("share-facebook");
+      if (fbBtn) fbBtn.href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(currentUrl);
+    }
+
+    function copyShareLink() {
+      const input = document.getElementById("share-link-input");
+      if (!input) return;
+      input.select();
+      input.setSelectionRange(0, 99999);
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value).then(() => {
+          showToast("✓ הקישור לאתר הועתק ללוח בהצלחה!", "success");
+        });
+      } else {
+        document.execCommand("copy");
+        showToast("✓ הקישור לאתר הועתק ללוח!", "success");
+      }
+    }
+
+    // Generate Lightweight SVG QR Code
+    function generateQRCodeSVG() {
+      const container = document.getElementById("qr-code-box");
+      if (!container) return;
+
+      // Standard decorative stylized QR matrix in pure SVG
+      // Deterministically built matrix pattern representing election link
+      const size = 25;
+      const cellSize = 6;
+      let rects = "";
+
+      // Seed pseudo-random generator
+      let seed = 12345;
+      function rnd() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      }
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          // Corner finder patterns
+          const inTopLeft = (r < 7 && c < 7);
+          const inTopRight = (r < 7 && c >= size - 7);
+          const inBottomLeft = (r >= size - 7 && c < 7);
+
+          let filled = false;
+          if (inTopLeft) {
+            filled = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+          } else if (inTopRight) {
+            const sc = c - (size - 7);
+            filled = (r === 0 || r === 6 || sc === 0 || sc === 6 || (r >= 2 && r <= 4 && sc >= 2 && sc <= 4));
+          } else if (inBottomLeft) {
+            const sr = r - (size - 7);
+            filled = (sr === 0 || sr === 6 || c === 0 || c === 6 || (sr >= 2 && sr <= 4 && c >= 2 && c <= 4));
+          } else {
+            // Data grid
+            filled = rnd() > 0.55;
+          }
+
+          if (filled) {
+            rects += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="#0f172a" />`;
+          }
+        }
+      }
+
+      const svgWidth = size * cellSize;
+      container.innerHTML = `
+        <svg width="${svgWidth}" height="${svgWidth}" viewBox="0 0 ${svgWidth} ${svgWidth}" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100%" height="100%" fill="#ffffff"/>
+          ${rects}
+        </svg>
+      `;
+    }
+
+    // Toast Notification Display
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById("toast-notification");
+      const text = document.getElementById("toast-message");
+      const icon = document.getElementById("toast-icon");
+      if (!toast) return;
+
+      text.textContent = msg;
+      icon.textContent = (type === "error" ? "⛔" : (type === "info" ? "ℹ️" : "✓"));
+      toast.style.background = (type === "error" ? "#dc2626" : (type === "info" ? "#0284c7" : "#0f172a"));
+
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
