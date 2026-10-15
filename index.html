@@ -2,9 +2,9 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>בחירות 2026 לכנסת ה-26 | קלפי אינטרנטית ולוח מנהל בחירות</title>
-  <meta name="description" content="מערכת הבחירות הרשמית לכנסת ה-26 (27 באוקטובר 2026) - פתקי הצבעה מלאים ומדויקים, לחיצה כפולה להטלה למעטפה, אכיפת הצבעה אחת ל-IP, ולוח מנהל בחירות עם חלוקת מנדטים בדר-עופר.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>בחירות 2026 לכנסת ה-26 | קלפי אינטרנטית, שקפי מצע ומפת הסכמי עודפים</title>
+  <meta name="description" content="מערכת הבחירות הרשמית לכנסת ה-26: פתקי הצבעה מלאים, שקף מצע (ביטחון, כלכלה, חינוך, גיוס) בריחוף, הצבעה מכל מכשיר, מפת הסכמי עודפים וחישוב מנדטים לפי חוק בדר-עופר.">
   <style>
     :root {
       --primary: #0a192f;
@@ -22,9 +22,9 @@
       --ballot-paper: #fefefb;
       --ballot-border: #111827;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
-      --shadow-ballot: 0 5px 15px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.09);
+      --shadow-lg: 0 12px 28px rgba(0,0,0,0.15);
+      --shadow-ballot: 0 6px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
       --radius: 12px;
     }
 
@@ -33,6 +33,7 @@
       margin: 0;
       padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -42,13 +43,14 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
     /* Header */
     header {
       background: linear-gradient(135deg, #071526 0%, #0f2744 100%);
       color: #ffffff;
-      padding: 1rem 1.5rem;
+      padding: 0.85rem 1.25rem;
       border-bottom: 3px solid var(--accent);
       position: sticky;
       top: 0;
@@ -57,42 +59,43 @@
     }
 
     .header-container {
-      max-width: 1350px;
+      max-width: 1400px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.75rem;
     }
 
     .logo-area {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.75rem;
     }
 
     .emblem {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       background: #ffffff;
       color: var(--primary);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
     }
 
     .title-group h1 {
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      line-height: 1.2;
     }
 
     .title-group p {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #94a3b8;
     }
 
@@ -100,44 +103,42 @@
       background: #1e3a8a;
       border: 1px solid #3b82f6;
       color: #bfdbfe;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
+      padding: 0.15rem 0.5rem;
+      border-radius: 5px;
       display: inline-block;
-      margin-right: 0.5rem;
+      margin-right: 0.35rem;
     }
 
-    /* Navigation Tabs */
+    /* Nav Tabs */
     .nav-tabs {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       background: rgba(255, 255, 255, 0.08);
-      padding: 0.35rem;
+      padding: 0.3rem;
       border-radius: 10px;
-      flex-wrap: wrap;
+      overflow-x: auto;
+      max-width: 100%;
     }
 
     .tab-btn {
       background: transparent;
       border: none;
       color: #e2e8f0;
-      padding: 0.55rem 1.1rem;
-      border-radius: 8px;
-      font-size: 0.92rem;
-      font-weight: 600;
+      padding: 0.5rem 0.9rem;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.45rem;
+      gap: 0.4rem;
+      white-space: nowrap;
       transition: all 0.2s ease;
     }
 
-    .tab-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-    }
-
+    .tab-btn:hover { background: rgba(255, 255, 255, 0.15); color: #ffffff; }
     .tab-btn.active {
       background: var(--accent);
       color: #ffffff;
@@ -148,27 +149,27 @@
     .status-bar {
       background: #ffffff;
       border-bottom: 1px solid var(--border);
-      padding: 0.65rem 1.5rem;
-      font-size: 0.85rem;
+      padding: 0.55rem 1.25rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
     .status-bar-container {
-      max-width: 1350px;
+      max-width: 1400px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
     .ip-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.3rem;
       background: #f1f5f9;
-      padding: 0.25rem 0.65rem;
+      padding: 0.2rem 0.55rem;
       border-radius: 6px;
       font-family: monospace;
       font-weight: 700;
@@ -178,125 +179,43 @@
     .voter-status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      padding: 0.25rem 0.65rem;
+      gap: 0.3rem;
+      padding: 0.2rem 0.55rem;
       border-radius: 6px;
       font-weight: 700;
     }
-
-    .voter-status-pill.can-vote {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .voter-status-pill.voted {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
+    .voter-status-pill.can-vote { background: #dcfce7; color: #15803d; }
+    .voter-status-pill.voted { background: #fee2e2; color: #b91c1c; }
 
     /* Main Container */
     main {
       flex: 1;
-      max-width: 1350px;
+      max-width: 1400px;
       width: 100%;
       margin: 0 auto;
-      padding: 1.5rem;
+      padding: 1.25rem;
     }
 
-    .view-section {
-      display: none;
-    }
-
-    .view-section.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
+    .view-section { display: none; }
+    .view-section.active { display: block; animation: fadeIn 0.3s ease; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Hero / Instructions */
-    .hero-instructions {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 1.25rem;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1.25rem;
-    }
-
-    .instructions-text h2 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 0.35rem;
-    }
-
-    .instructions-text p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .btn {
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-size: 0.92rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      border: 1px solid transparent;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #ffffff;
-    }
-    .btn-primary:hover { background: var(--accent-hover); }
-
-    .btn-outline {
-      background: #ffffff;
-      border-color: var(--border);
-      color: var(--text);
-    }
-    .btn-outline:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: #ffffff;
-    }
-    .btn-danger:hover { background: #b91c1c; }
-
-    /* Double Click Notice Banner */
+    /* Hero / Notices */
     .action-notice-banner {
       background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       border: 1.5px solid #60a5fa;
       border-radius: 12px;
-      padding: 1rem 1.5rem;
-      margin-bottom: 1.5rem;
+      padding: 0.9rem 1.25rem;
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.75rem;
       box-shadow: var(--shadow-sm);
     }
 
@@ -306,26 +225,27 @@
       gap: 0.75rem;
       color: #1e3a8a;
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 0.98rem;
     }
 
     .notice-badge {
       background: #2563eb;
       color: #ffffff;
-      padding: 0.35rem 0.85rem;
+      padding: 0.3rem 0.8rem;
       border-radius: 20px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 800;
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
+      flex-shrink: 0;
     }
 
     /* Filter & Search Bar */
     .filter-bar {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
@@ -333,21 +253,20 @@
 
     .search-box {
       flex: 1;
-      min-width: 280px;
+      min-width: 250px;
       position: relative;
     }
 
     .search-box input {
       width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
       border: 1.5px solid var(--border);
       border-radius: 10px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       background: #ffffff;
       outline: none;
       transition: border-color 0.2s;
     }
-
     .search-box input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
@@ -355,7 +274,7 @@
 
     .search-icon {
       position: absolute;
-      left: 1rem;
+      left: 0.85rem;
       top: 50%;
       transform: translateY(-50%);
       color: #94a3b8;
@@ -363,36 +282,31 @@
 
     .filter-pills {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.35rem;
       flex-wrap: wrap;
     }
 
     .pill {
-      padding: 0.4rem 0.85rem;
+      padding: 0.35rem 0.75rem;
       border-radius: 20px;
       border: 1px solid var(--border);
       background: #ffffff;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s;
     }
-
-    .pill:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
+    .pill:hover { border-color: var(--accent); color: var(--accent); }
     .pill.active {
       background: var(--primary);
       border-color: var(--primary);
       color: #ffffff;
     }
 
-    /* Ballot Slips Tray Grid */
+    /* BALLOT TRAY GRID */
     .ballots-tray-title {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 800;
       margin-bottom: 1rem;
       color: var(--primary);
@@ -405,23 +319,23 @@
 
     .ballots-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.1rem;
       margin-bottom: 2.5rem;
     }
 
-    /* AUTHENTIC ISRAELI BALLOT SLIP COMPONENT */
+    /* AUTHENTIC ISRAELI BALLOT SLIP CARD */
     .ballot-slip-card {
       background: var(--ballot-paper);
       border: 2px solid var(--ballot-border);
       border-radius: 4px;
-      padding: 1.4rem 1rem 1rem;
+      padding: 1.25rem 0.9rem 0.85rem;
       box-shadow: var(--shadow-ballot);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      min-height: 275px;
+      min-height: 270px;
       cursor: pointer;
       position: relative;
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
@@ -431,82 +345,323 @@
     }
 
     .ballot-slip-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 16px 30px rgba(0,0,0,0.14);
+      transform: translateY(-6px);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.12);
       border-color: var(--accent);
     }
 
-    .ballot-slip-card:active {
-      transform: scale(0.98);
+    .ballot-top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: absolute;
+      top: 6px;
+      left: 0;
+      right: 0;
+      padding: 0 8px;
     }
 
     .ballot-official-tag {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
       background: #f1f5f9;
       color: #334155;
       border: 1px solid #cbd5e1;
     }
 
-    /* Authentic Big Hebrew Letters */
+    .platform-info-btn {
+      background: #e0f2fe;
+      border: 1px solid #7dd3fc;
+      color: #0369a1;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s;
+    }
+    .platform-info-btn:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
+
     .ballot-letter-huge {
-      font-size: 3.8rem;
+      font-size: 3.6rem;
       font-weight: 900;
       color: #000000;
       line-height: 1;
-      margin: 0.8rem 0 0.5rem;
+      margin: 1.1rem 0 0.5rem;
       text-align: center;
       letter-spacing: -0.04em;
     }
 
-    /* Authentic Subtitle Content on Israeli Ballot */
     .ballot-official-name {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 800;
       color: #111827;
       text-align: center;
       line-height: 1.35;
       margin-top: auto;
       border-top: 1.5px solid #e5e7eb;
-      padding-top: 0.75rem;
+      padding-top: 0.65rem;
       width: 100%;
     }
 
-    .ballot-dblclick-trigger {
-      margin-top: 0.75rem;
+    .ballot-card-actions {
+      display: flex;
       width: 100%;
+      gap: 0.4rem;
+      margin-top: 0.65rem;
+    }
+
+    .ballot-action-vote {
+      flex: 1;
       text-align: center;
-      padding: 0.4rem 0.5rem;
+      padding: 0.4rem;
       border-radius: 6px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: var(--accent);
-      transition: all 0.15s ease;
+      cursor: pointer;
+      transition: all 0.15s;
     }
-
-    .ballot-slip-card:hover .ballot-dblclick-trigger {
+    .ballot-slip-card:hover .ballot-action-vote {
       background: var(--accent);
       color: #ffffff;
       border-color: var(--accent);
     }
 
-    .ballot-slip-card.blank-slip {
-      border-style: dashed;
-      background: #fbfbfa;
-    }
-    .ballot-slip-card.blank-slip .ballot-letter-huge {
-      font-size: 2rem;
-      color: #64748b;
+    .ballot-slip-card.blank-slip { border-style: dashed; background: #fbfbfa; }
+    .ballot-slip-card.blank-slip .ballot-letter-huge { font-size: 2rem; color: #64748b; }
+
+    /* ============================================================== */
+    /* HOVER & MODAL: PARTY PLATFORM SLIDE CARD (שקף מצע המפלגה)     */
+    /* ============================================================== */
+    .platform-slide-card {
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.22);
+      padding: 1.25rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: right;
+      z-index: 1000;
+      position: absolute;
+      display: none;
+      animation: fadeIn 0.15s ease-out;
+      pointer-events: auto;
     }
 
-    /* ANIMATED ENVELOPE FULLSCREEN OVERLAY */
+    .platform-slide-card.active { display: block; }
+
+    .platform-slide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .platform-badge-letter {
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .platform-title-area h4 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .platform-title-area p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* 4 Pillars Grid on Platform Slide */
+    .platform-pillars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .pillar-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem;
+    }
+
+    .pillar-header {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+    }
+
+    .pillar-box.security .pillar-header { color: #b91c1c; }
+    .pillar-box.economy .pillar-header { color: #047857; }
+    .pillar-box.education .pillar-header { color: #1d4ed8; }
+    .pillar-box.enlistment .pillar-header { color: #7c2d12; }
+
+    .pillar-body {
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: #334155;
+    }
+
+    .platform-surplus-note {
+      background: #fef3c7;
+      border: 1px solid #fde047;
+      border-radius: 6px;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Fullscreen Modal for Platform Slide on Mobile */
+    .platform-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 25, 47, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .platform-modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+
+    .platform-modal-box {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* SURPLUS AGREEMENTS MAP SECTION */
+    .surplus-section {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .surplus-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .surplus-pair-card {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 1rem;
+      position: relative;
+    }
+
+    .surplus-pair-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .surplus-pair-status {
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+    .surplus-pair-status.active { background: #dcfce7; color: #15803d; }
+    .surplus-pair-status.inactive { background: #fee2e2; color: #b91c1c; }
+
+    .surplus-impact-tag {
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+    }
+
+    /* COMPARISON TABLE: WITH VS WITHOUT SURPLUS */
+    .comparison-table-wrap {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    table.comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 0.88rem;
+    }
+
+    table.comparison-table th {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      font-weight: 800;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    table.comparison-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .seat-diff-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+    .seat-diff-badge.plus { background: #dcfce7; color: #15803d; }
+    .seat-diff-badge.minus { background: #fee2e2; color: #b91c1c; }
+    .seat-diff-badge.zero { background: #f1f5f9; color: #64748b; }
+
+    /* ANIMATED ENVELOPE SCREEN OVERLAY */
     .envelope-screen-overlay {
       display: none;
       position: fixed;
@@ -519,57 +674,46 @@
       flex-direction: column;
     }
 
-    .envelope-screen-overlay.active {
-      display: flex;
-      animation: fadeIn 0.2s ease forwards;
-    }
+    .envelope-screen-overlay.active { display: flex; animation: fadeIn 0.2s ease forwards; }
 
     .anim-envelope-stage {
       position: relative;
-      width: 340px;
-      height: 230px;
+      width: 320px;
+      height: 220px;
       perspective: 1000px;
     }
 
-    /* Selected Paper Slip Sliding into Envelope */
     .anim-paper-slip {
       position: absolute;
-      top: -130px;
-      left: 40px;
-      width: 260px;
-      height: 170px;
+      top: -120px;
+      left: 35px;
+      width: 250px;
+      height: 160px;
       background: #fefefb;
       border: 2px solid #111827;
       border-radius: 6px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 1rem;
       z-index: 10;
-      transform: translateY(0);
       transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.85s ease;
     }
-
-    .anim-paper-slip.slide-in {
-      transform: translateY(120px) scale(0.92);
-      opacity: 0.85;
-      z-index: 5;
-    }
+    .anim-paper-slip.slide-in { transform: translateY(115px) scale(0.92); opacity: 0.85; z-index: 5; }
 
     .anim-envelope-body {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 190px;
+      height: 180px;
       background: #1e3a8a;
       border-radius: 12px;
       border: 3px solid #3b82f6;
       box-shadow: 0 20px 45px rgba(0,0,0,0.5);
       z-index: 8;
-      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -581,128 +725,61 @@
       left: 0;
       right: 0;
       height: 0;
-      border-left: 170px solid transparent;
-      border-right: 170px solid transparent;
-      border-top: 95px solid #2563eb;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 90px solid #2563eb;
       transform-origin: top;
       transition: transform 0.45s ease 0.9s;
       z-index: 12;
     }
-
-    .anim-envelope-flap.close-flap {
-      transform: rotateX(180deg);
-      border-top-color: #1d4ed8;
-    }
+    .anim-envelope-flap.close-flap { transform: rotateX(180deg); border-top-color: #1d4ed8; }
 
     .anim-envelope-seal {
       position: absolute;
-      top: 65px;
-      width: 56px;
-      height: 56px;
+      top: 60px;
+      width: 52px;
+      height: 52px;
       background: #d97706;
       border-radius: 50%;
       border: 3px solid #fef3c7;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-size: 1.5rem;
       z-index: 15;
       opacity: 0;
       transform: scale(0.4);
       transition: all 0.35s ease 1.1s;
     }
-
-    .anim-envelope-seal.show-seal {
-      opacity: 1;
-      transform: scale(1);
-    }
+    .anim-envelope-seal.show-seal { opacity: 1; transform: scale(1); }
 
     .anim-envelope-label {
       position: absolute;
-      bottom: 18px;
-      font-size: 1rem;
+      bottom: 15px;
+      font-size: 0.95rem;
       font-weight: 800;
       color: #bfdbfe;
       letter-spacing: 0.05em;
-      text-align: center;
       z-index: 9;
     }
 
     .anim-success-msg {
-      margin-top: 2.2rem;
+      margin-top: 2rem;
       color: #ffffff;
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       font-weight: 900;
       text-align: center;
       opacity: 0;
       transform: translateY(15px);
       transition: all 0.4s ease 1.25s;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.6);
     }
+    .anim-success-msg.show-msg { opacity: 1; transform: translateY(0); }
 
-    .anim-success-msg.show-msg {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Success Card View */
-    .success-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      box-shadow: var(--shadow-md);
-      max-width: 650px;
-      margin: 2rem auto;
-    }
-
-    .success-icon {
-      width: 76px;
-      height: 76px;
-      background: #dcfce7;
-      color: var(--success);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.6rem;
-      margin: 0 auto 1.25rem;
-    }
-
-    .receipt-box {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.25rem;
-      margin: 1.5rem 0;
-      text-align: right;
-      font-size: 0.92rem;
-    }
-
-    .receipt-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.45rem 0;
-      border-bottom: 1px dashed #e2e8f0;
-    }
-    .receipt-row:last-child { border-bottom: none; }
-
-    /* Admin Dashboard */
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
+    /* KPI Grid */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.9rem;
       margin-bottom: 1.5rem;
     }
 
@@ -710,113 +787,34 @@
       background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 1.25rem;
+      padding: 1.15rem;
       box-shadow: var(--shadow-sm);
     }
 
-    .kpi-label {
-      font-size: 0.82rem;
+    .kpi-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .kpi-value { font-size: 1.7rem; font-weight: 900; color: var(--primary); line-height: 1.1; }
+
+    /* Buttons */
+    .btn {
+      padding: 0.55rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
       font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    .kpi-value {
-      font-size: 1.75rem;
-      font-weight: 900;
-      color: var(--primary);
-      line-height: 1.1;
-    }
-
-    /* Results Table */
-    .results-table-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 1.5rem;
-    }
-
-    .results-table-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .table-container {
-      overflow-x: auto;
-      width: 100%;
-    }
-
-    table.results-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: right;
-      font-size: 0.92rem;
-    }
-
-    table.results-table th {
-      background: #f8fafc;
-      color: var(--text-muted);
-      font-weight: 800;
-      padding: 0.85rem 1rem;
-      border-bottom: 2px solid var(--border);
-      white-space: nowrap;
-    }
-
-    table.results-table td {
-      padding: 0.85rem 1rem;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    .mini-ballot-badge {
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 52px;
-      padding: 0.2rem 0.6rem;
-      background: #ffffff;
-      border: 1.5px solid #111827;
-      border-radius: 4px;
-      font-weight: 900;
-      font-size: 1.15rem;
-      color: #000;
+      gap: 0.4rem;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
     }
+    .btn-primary { background: var(--accent); color: #ffffff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-outline { background: #ffffff; border-color: var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-danger { background: var(--danger); color: #ffffff; }
 
-    .status-tag {
-      display: inline-block;
-      padding: 0.25rem 0.65rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 800;
-    }
-    .status-tag.passed { background: #dcfce7; color: #15803d; }
-    .status-tag.failed { background: #f1f5f9; color: #64748b; }
-
-    /* Knesset Arch */
-    .knesset-section {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .knesset-diagram-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1rem 0;
-    }
-
-    /* Share Modal */
+    /* Modals & Toasts */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -828,54 +826,26 @@
       justify-content: center;
       padding: 1rem;
     }
-
-    .modal-overlay.active {
-      display: flex;
-      animation: fadeIn 0.2s ease;
-    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
 
     .modal-content {
       background: #ffffff;
       border-radius: 16px;
       width: 100%;
-      max-width: 500px;
+      max-width: 480px;
       box-shadow: var(--shadow-lg);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
     }
 
     .modal-header {
       background: var(--primary);
       color: #ffffff;
-      padding: 1.25rem 1.5rem;
+      padding: 1.1rem 1.4rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .modal-close {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .modal-footer {
-      padding: 1rem 1.5rem;
-      background: #f8fafc;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 2rem;
@@ -883,30 +853,28 @@
       transform: translateX(-50%) translateY(100px);
       background: #0f172a;
       color: #ffffff;
-      padding: 0.75rem 1.5rem;
+      padding: 0.7rem 1.5rem;
       border-radius: 30px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       box-shadow: var(--shadow-lg);
       z-index: 99999;
       opacity: 0;
       transition: all 0.3s ease;
     }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    /* Footer */
-    footer {
-      background: #071526;
-      color: #94a3b8;
-      padding: 1.5rem;
-      font-size: 0.85rem;
-      text-align: center;
-      border-top: 1px solid #1e293b;
-      margin-top: auto;
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header { padding: 0.75rem 1rem; }
+      .header-container { flex-direction: column; align-items: stretch; }
+      .ballots-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
+      .ballot-slip-card { min-height: 230px; padding: 1rem 0.6rem 0.6rem; }
+      .ballot-letter-huge { font-size: 2.8rem; margin: 0.8rem 0 0.3rem; }
+      .ballot-official-name { font-size: 0.78rem; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .platform-pillars-grid { grid-template-columns: 1fr; }
+      .platform-slide-card { display: none !important; } /* Use modal on mobile */
     }
   </style>
 </head>
@@ -922,7 +890,7 @@
             בחירות 2026 לכנסת ה-26 | קלפי אינטרנטית
             <span class="election-date-badge">27 באוקטובר 2026</span>
           </h1>
-          <p>פתקי הצבעה רשמיים, אכיפת הצבעה אחת ל-IP, ולוח תוצאות ומנדטים לפי חוק בדר-עופר</p>
+          <p>פתקי הצבעה רשמיים, שקפי מצע בריחוף, מפת הסכמי עודפים וחישוב מנדטים</p>
         </div>
       </div>
       <nav class="nav-tabs">
@@ -930,7 +898,7 @@
           <span>🗳️</span> קלפי לבוחר
         </button>
         <button class="tab-btn" onclick="switchView('admin')" id="tab-admin">
-          <span>📊</span> לוח מנהל הבחירות
+          <span>📊</span> תוצאות ועודפים
         </button>
         <button class="tab-btn" onclick="openShareModal()" id="tab-share">
           <span>🔗</span> שתף קישור
@@ -942,18 +910,18 @@
     </div>
   </header>
 
-  <!-- Status & IP Indicator Bar -->
+  <!-- Status Bar -->
   <div class="status-bar">
     <div class="status-bar-container">
       <div>
-        <span>מועד הבחירות: <strong>יום שלישי, ט"ז בחשוון תשפ"ז (27.10.2026)</strong></span>
-        <span style="margin: 0 0.5rem;">|</span>
+        <span>מועד הבחירות: <strong>27.10.2026</strong></span>
+        <span style="margin: 0 0.4rem;">|</span>
         <span>אחוז חסימה: <strong>3.25%</strong></span>
-        <span style="margin: 0 0.5rem;">|</span>
-        <span>חלוקה: <strong>120 מנדטים (חוק בדר-עופר)</strong></span>
+        <span style="margin: 0 0.4rem;">|</span>
+        <span>שיטת חלוקה: <strong>חוק בדר-עופר עם הסכמי עודפים</strong></span>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span>כתובת ה-IP שלך:</span>
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span>כתובת IP:</span>
         <span class="ip-badge" id="current-ip-display">192.168.1.101</span>
         <span class="voter-status-pill can-vote" id="ip-status-pill">✓ רשאי להצביע</span>
       </div>
@@ -966,24 +934,26 @@
     <!-- 1. VOTER TRAY VIEW -->
     <section id="view-voter" class="view-section active">
 
-      <!-- Action & Instructions Notice Banner -->
+      <!-- Action Notice Banner -->
       <div class="action-notice-banner">
         <div class="notice-icon-text">
-          <span style="font-size: 1.6rem;">⚡</span>
+          <span style="font-size: 1.5rem;">⚡</span>
           <div>
-            <div><strong>הצבעה ישירה ומהירה:</strong> לחיצה כפולה (Double Click) על כל פתק תשלשל אותו מיד למעטפה!</div>
-            <div style="font-size: 0.85rem; font-weight: normal; color: #1e40af;">פרטי המפלגה ישלחו כטופס הצבעה לבסיס הנתונים ויירשמו כחוק. כל בוחר רשאי להצביע פעם אחת מכתובת ה-IP שלו.</div>
+            <div><strong>הצבעה קלה ומהירה:</strong> לחיצה כפולה (Double Click / דאבל טאפ) על פתק תשלשל אותו למעטפה!</div>
+            <div style="font-size: 0.84rem; font-weight: normal; color: #1e40af;">
+              מרחף עם העכבר מעל הפתק? יופיע <strong>שקף מצע המפלגה</strong> (ביטחון, כלכלה, חינוך וגיוס). בנייד לחץ על "👁️ מצע".
+            </div>
           </div>
         </div>
         <div>
-          <span class="notice-badge">🗳️ לחץ דאבל-קליק להצבעה</span>
+          <span class="notice-badge">🗳️ הצבעה ישירה וחלקה</span>
         </div>
       </div>
 
-      <!-- Filter & Search Bar -->
+      <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="search-box">
-          <input type="text" id="voter-search" placeholder="חפש אותיות פתק (למשל: מחל, פה, רק, אמת, שס) או שם מפלגה..." oninput="filterBallots()">
+          <input type="text" id="voter-search" placeholder="חפש לפי אותיות (מחל, פה, רק, אמת, שס) או שם מפלגה..." oninput="filterBallots()">
           <span class="search-icon">🔍</span>
         </div>
         <div class="filter-pills">
@@ -996,70 +966,58 @@
 
       <div class="ballots-tray-title">
         <span>📋 מגש פתקי ההצבעה הרשמיים לכנסת ה-26:</span>
-        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">סה"כ 21 רשימות מתמודדות מאושרות</span>
+        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">סה"כ 21 רשימות מתמודדות</span>
       </div>
 
-      <!-- Ballot Slips Tray Grid -->
+      <!-- Grid of Ballot Cards -->
       <div class="ballots-grid" id="ballots-grid">
-        <!-- Rendered dynamically as distinct BallotSlip objects -->
+        <!-- Rendered dynamically -->
       </div>
     </section>
 
     <!-- 2. VOTER SUCCESS VIEW -->
     <section id="view-success" class="view-section">
-      <div class="success-card">
-        <div class="success-icon">✓</div>
-        <h2 style="font-size: 1.7rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem;">
-          הצבעתך התקבלה בהצלחה!
-        </h2>
-        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">
-          פתק ההצבעה שולשל למעטפה החשאית, טופס ההצבעה נשלח בהצלחה ונרשם במסד הנתונים.
-        </p>
+      <div style="background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem 1.5rem; text-align: center; max-width: 600px; margin: 2rem auto; box-shadow: var(--shadow-md);">
+        <div style="width: 72px; height: 72px; background: #dcfce7; color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.25rem;">✓</div>
+        <h2 style="font-size: 1.65rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem;">הצבעתך התקבלה בהצלחה!</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">פתק ההצבעה שולשל למעטפה, נרשם כחוק בבסיס הנתונים ונספר בתוצאות הבחירות.</p>
 
-        <div class="receipt-box">
-          <div class="receipt-row">
-            <span style="color: var(--text-muted);">אסמכתת הצבעה רשמית:</span>
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: right; font-size: 0.9rem;">
+          <div style="display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px dashed #e2e8f0;">
+            <span style="color: var(--text-muted);">אסמכתת הצבעה:</span>
             <span style="font-weight: 800; font-family: monospace;" id="receipt-id">VOTE-2026-ISR</span>
           </div>
-          <div class="receipt-row">
+          <div style="display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px dashed #e2e8f0;">
             <span style="color: var(--text-muted);">המפלגה שנבחרה:</span>
             <span style="font-weight: 800;" id="receipt-party">הליכוד (מחל)</span>
           </div>
-          <div class="receipt-row">
+          <div style="display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px dashed #e2e8f0;">
             <span style="color: var(--text-muted);">כתובת IP שנרשמה:</span>
             <span style="font-weight: 800; font-family: monospace;" id="receipt-ip">192.168.1.101</span>
           </div>
-          <div class="receipt-row">
-            <span style="color: var(--text-muted);">מועד ההצבעה:</span>
-            <span style="font-weight: 800;" id="receipt-time">14/10/2026 21:00</span>
-          </div>
-          <div class="receipt-row">
+          <div style="display: flex; justify-content: space-between; padding: 0.35rem 0;">
             <span style="color: var(--text-muted);">סטטוס זכות הצבעה:</span>
-            <span style="font-weight: 800; color: var(--danger);">מוצתה (חסום להצבעות כפולות)</span>
+            <span style="font-weight: 800; color: var(--danger);">מוצתה (חסום להצבעה כפולה)</span>
           </div>
         </div>
 
         <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="openShareModal()">
-            <span>🔗</span> שתף את אתר הבחירות
-          </button>
-          <button class="btn btn-outline" onclick="switchView('admin')">
-            <span>📊</span> צפה בתוצאות האמת ומנדטים
-          </button>
+          <button class="btn btn-primary" onclick="openShareModal()"><span>🔗</span> שתף את אתר הבחירות</button>
+          <button class="btn btn-outline" onclick="switchView('admin')"><span>📊</span> צפה בתוצאות האמת ומפת העודפים</button>
         </div>
       </div>
     </section>
 
-    <!-- 3. ADMIN DASHBOARD VIEW -->
+    <!-- 3. ADMIN & SURPLUS RESULTS VIEW -->
     <section id="view-admin" class="view-section">
-      <div class="admin-header">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
         <div>
-          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">לוח הבקרה של מנהל הבחירות</h2>
-          <p style="color: var(--text-muted); font-size: 0.92rem;">ספירת קולות בזמן אמת, אחוז החסימה (3.25%) וחלוקת 120 מנדטים לפי חוק בדר-עופר</p>
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">לוח מנהל הבחירות: תוצאות, מנדטים ומפת הסכמי עודפים</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">ניתוח מעבר אחוז החסימה (3.25%) ויישום חוק בדר-עופר עם ובלי הסכמי עודפים</p>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button class="btn btn-outline" onclick="openShareModal()"><span>🔗</span> שתף קישור</button>
-          <button class="btn btn-outline" onclick="seedSampleVotes()"><span>🎲</span> הזן 10,000 קולות דמה</button>
+          <button class="btn btn-outline" onclick="seedSampleVotes()"><span>🎲</span> הזן 10,000 קולות דמה לבדיקה</button>
           <button class="btn btn-outline" onclick="exportResultsCSV()"><span>📥</span> ייצוא CSV</button>
           <button class="btn btn-danger" onclick="confirmResetVotes()"><span>🗑️</span> איפוס קלפי</button>
         </div>
@@ -1070,68 +1028,97 @@
         <div class="kpi-card">
           <div class="kpi-label">סה"כ קולות בקלפי</div>
           <div class="kpi-value" id="kpi-total-votes">0</div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">קולות מכתובות IP ייחודיות</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">קולות כשרים</div>
           <div class="kpi-value" id="kpi-valid-votes" style="color: var(--success);">0</div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;" id="kpi-valid-pct">100% מהקולות</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">פתקים לבנים / פסולים</div>
           <div class="kpi-value" id="kpi-invalid-votes" style="color: var(--text-muted);">0</div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;" id="kpi-invalid-pct">0% מהקולות</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">אחוז החסימה (3.25%)</div>
           <div class="kpi-value" id="kpi-threshold-votes">0</div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">סף קולות מינימלי</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">מפלגות שעברו את החסימה</div>
           <div class="kpi-value" id="kpi-passed-parties" style="color: var(--accent);">0</div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">נכנסו לכנסת ה-26</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">מנדטים שחולקו</div>
           <div class="kpi-value" id="kpi-total-seats" style="color: var(--gold);">120 / 120</div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">לפי נוסחת בדר-עופר</div>
+        </div>
+      </div>
+
+      <!-- SURPLUS AGREEMENTS MAP SECTION -->
+      <div class="surplus-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.75rem;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">🤝 מפת הסכמי העודפים הרשומים ומה קרה בפועל לאור חוק בדר-עופר</h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">סעיף 82 לחוק הבחירות לכנסת</span>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0.75rem 0;">
+          על פי חוק בדר-עופר, שתי רשימות שחתמו על הסכם עודפים ועברו שתיהן את אחוז החסימה (3.25%), נחשבות כרשימה אחת לצורך חלוקת עודפי המנדטים. המנדט העודף מוענק פנימית לרשימה בעלת המודד הגבוה יותר מבין השתיים.
+        </p>
+
+        <!-- Surplus Pairs Grid -->
+        <div class="surplus-grid" id="surplus-pairs-grid">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Comparative Table: With vs Without Surplus Agreements -->
+        <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--primary); margin: 1.25rem 0 0.5rem;">
+          📊 השוואת חלוקת 120 המנדטים: עם הסכמי עודפים מול ללא הסכמים
+        </h4>
+        <div class="comparison-table-wrap">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>אות</th>
+                <th>שם המפלגה</th>
+                <th>קולות כשרים</th>
+                <th>אחוז מהקולות</th>
+                <th>מנדטים ללא הסכמים</th>
+                <th>מנדטים בפועל (עם הסכמים)</th>
+                <th>השפעת ההסכם</th>
+                <th>שותף להסכם עודפים</th>
+              </tr>
+            </thead>
+            <tbody id="comparison-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
         </div>
       </div>
 
       <!-- Knesset Chamber Semicircle Visualizer -->
-      <div class="knesset-section">
+      <div style="background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary);">🏛️ הדמיית מליאת הכנסת ה-26 (120 מושבים)</h3>
-          <span style="font-size: 0.85rem; color: var(--text-muted);">חלוקה סיעתית רשמית</span>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">רוב קואליציוני נדרש: 61</span>
         </div>
-        <div class="knesset-diagram-container">
+        <div style="display: flex; flex-direction: column; align-items: center;">
           <canvas id="knesset-canvas" width="600" height="320" style="max-width: 100%;"></canvas>
-          <div style="width: 100%; max-width: 600px; margin-top: 1rem; background: #f1f5f9; border-radius: 8px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem;">
-            <span>רוב קואליציוני נדרש: <strong>61 מנדטים</strong></span>
-            <span id="majority-status-text" style="color: var(--primary);">המליאה מוכנה להרכבת ממשלה</span>
-          </div>
         </div>
       </div>
 
-      <!-- Full Results Table -->
-      <div class="results-table-card">
-        <div class="results-table-header">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary);">📋 טבלת תוצאות הבחירות המלאה וחלוקת המנדטים</h3>
-          <span style="font-size: 0.85rem; color: var(--text-muted);">מעודכן אוטומטית לפי תוצאות הקלפי</span>
+      <!-- Main Results Table -->
+      <div style="background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+        <div style="padding: 1.25rem; border-bottom: 1px solid var(--border);">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary);">📋 פירוט כל המפלגות והמנדטים הסופיים</h3>
         </div>
-        <div class="table-container">
-          <table class="results-table">
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.92rem;">
             <thead>
-              <tr>
-                <th style="width: 70px;">פתק</th>
-                <th>שם הרשימה והאותיות</th>
-                <th>מספר קולות</th>
-                <th>אחוז מהקולות הכשרים</th>
-                <th>מעבר אחוז חסימה (3.25%)</th>
-                <th>מנדטים (בדר-עופר)</th>
-                <th>שיעור בכנסת</th>
-                <th>גרף יחסי</th>
+              <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+                <th style="padding: 0.85rem 1rem;">פתק</th>
+                <th style="padding: 0.85rem 1rem;">שם הרשימה</th>
+                <th style="padding: 0.85rem 1rem;">קולות</th>
+                <th style="padding: 0.85rem 1rem;">אחוז מהכשרים</th>
+                <th style="padding: 0.85rem 1rem;">חסימה (3.25%)</th>
+                <th style="padding: 0.85rem 1rem;">מנדטים (בדר-עופר)</th>
+                <th style="padding: 0.85rem 1rem;">הסכם עודפים</th>
               </tr>
             </thead>
             <tbody id="results-table-body">
@@ -1142,39 +1129,28 @@
       </div>
     </section>
 
-    <!-- 4. IP TEST & SIMULATION VIEW -->
+    <!-- 4. IP TEST & SIMULATOR VIEW -->
     <section id="view-iptest" class="view-section">
-      <div class="hero-instructions">
-        <div>
-          <h2>בדיקת מנגנון אכיפת IP והצבעה חד-פעמית</h2>
-          <p>כלי זה מאפשר לבחון את חסימת ה-IP, להחליף כתובות IP לבדיקה, ולראות את יומן ההצבעות שנאספו.</p>
-        </div>
-        <div>
-          <button class="btn btn-outline" onclick="generateRandomIP()">🎲 צור כתובת IP אקראית לבדיקה</button>
-        </div>
-      </div>
-
-      <div class="results-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
-        <h3 style="margin-bottom: 1rem; color: var(--primary);">החלפת כתובת IP נוכחית:</h3>
-        <div style="display: flex; gap: 0.75rem; max-width: 500px; flex-wrap: wrap;">
-          <input type="text" id="manual-ip-input" placeholder="למשל: 10.0.0.88" style="flex: 1; padding: 0.65rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: monospace;">
+      <div style="background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">בדיקת הצבעה אחת ל-IP</h2>
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.25rem;">מאפשר לבחון חסימת הצבעה כפולה ולהחליף כתובות IP לבדיקת המערכת.</p>
+        
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+          <input type="text" id="manual-ip-input" placeholder="הקלד IP, למשל 10.0.0.99" style="padding: 0.65rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: monospace;">
           <button class="btn btn-primary" onclick="setManualIP()">החלף IP</button>
+          <button class="btn btn-outline" onclick="generateRandomIP()">🎲 צור IP אקראי</button>
           <button class="btn btn-outline" onclick="clearCurrentIPVote()">מחק הצבעה מ-IP זה</button>
         </div>
-      </div>
 
-      <div class="results-table-card">
-        <div class="results-table-header">
-          <h3>יומן כתובות IP שהצביעו עד כה</h3>
-        </div>
-        <div class="table-container">
-          <table class="results-table">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 0.75rem;">יומן כתובות IP שהצביעו:</h3>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.88rem;">
             <thead>
-              <tr>
-                <th>כתובת IP</th>
-                <th>זמן הצבעה</th>
-                <th>מפלגה שנבחרה</th>
-                <th>פעולה</th>
+              <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
+                <th style="padding: 0.65rem 0.85rem;">כתובת IP</th>
+                <th style="padding: 0.65rem 0.85rem;">זמן הצבעה</th>
+                <th style="padding: 0.65rem 0.85rem;">מפלגה</th>
+                <th style="padding: 0.65rem 0.85rem;">פעולה</th>
               </tr>
             </thead>
             <tbody id="ip-log-body">
@@ -1187,29 +1163,96 @@
 
   </main>
 
+  <!-- FLOATING PLATFORM SLIDE CARD (Desktop Hover) -->
+  <div class="platform-slide-card" id="floating-platform-card">
+    <div class="platform-slide-header">
+      <div class="platform-title-area">
+        <h4 id="fp-title">שם המפלגה</h4>
+        <p id="fp-sub">כינוי הרשימה הרשמי</p>
+      </div>
+      <div class="platform-badge-letter" id="fp-letter">מחל</div>
+    </div>
+
+    <!-- 4 Pillars -->
+    <div class="platform-pillars-grid">
+      <div class="pillar-box security">
+        <div class="pillar-header"><span>🛡️</span> <span>ביטחון</span></div>
+        <div class="pillar-body" id="fp-sec">תוכן ביטחוני</div>
+      </div>
+      <div class="pillar-box economy">
+        <div class="pillar-header"><span>💰</span> <span>כלכלה</span></div>
+        <div class="pillar-body" id="fp-eco">תוכן כלכלי</div>
+      </div>
+      <div class="pillar-box education">
+        <div class="pillar-header"><span>🎓</span> <span>חינוך</span></div>
+        <div class="pillar-body" id="fp-edu">תוכן חינוך</div>
+      </div>
+      <div class="pillar-box enlistment">
+        <div class="pillar-header"><span>🎖️</span> <span>גיוס</span></div>
+        <div class="pillar-body" id="fp-enl">תוכן גיוס</div>
+      </div>
+    </div>
+
+    <div class="platform-surplus-note" id="fp-surplus">
+      <span>🤝</span> <span id="fp-surplus-text">הסכם עודפים</span>
+    </div>
+  </div>
+
+  <!-- PLATFORM MODAL (Mobile & Tablet Click) -->
+  <div class="platform-modal-overlay" id="platform-modal" onclick="closePlatformModal(event)">
+    <div class="platform-modal-box" onclick="event.stopPropagation()">
+      <div class="platform-slide-header">
+        <div class="platform-title-area">
+          <h4 id="mp-title" style="font-size: 1.25rem;">שם המפלגה</h4>
+          <p id="mp-sub">כינוי הרשימה הרשמי</p>
+        </div>
+        <div class="platform-badge-letter" id="mp-letter" style="width: 52px; height: 52px; font-size: 1.8rem;">מחל</div>
+      </div>
+
+      <div class="platform-pillars-grid" style="grid-template-columns: 1fr; gap: 0.85rem;">
+        <div class="pillar-box security">
+          <div class="pillar-header" style="font-size: 0.95rem;"><span>🛡️</span> <span>תחום הביטחון הלאומי</span></div>
+          <div class="pillar-body" id="mp-sec" style="font-size: 0.85rem;"></div>
+        </div>
+        <div class="pillar-box economy">
+          <div class="pillar-header" style="font-size: 0.95rem;"><span>💰</span> <span>תחום הכלכלה ויוקר המחיה</span></div>
+          <div class="pillar-body" id="mp-eco" style="font-size: 0.85rem;"></div>
+        </div>
+        <div class="pillar-box education">
+          <div class="pillar-header" style="font-size: 0.95rem;"><span>🎓</span> <span>תחום החינוך והליב"ה</span></div>
+          <div class="pillar-body" id="mp-edu" style="font-size: 0.85rem;"></div>
+        </div>
+        <div class="pillar-box enlistment">
+          <div class="pillar-header" style="font-size: 0.95rem;"><span>🎖️</span> <span>חוק הגיוס והשוויון בנטל</span></div>
+          <div class="pillar-body" id="mp-enl" style="font-size: 0.85rem;"></div>
+        </div>
+      </div>
+
+      <div class="platform-surplus-note" id="mp-surplus" style="margin-bottom: 1.25rem;">
+        <span>🤝</span> <span id="mp-surplus-text"></span>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button class="btn btn-outline" onclick="closePlatformModal()">סגור</button>
+        <button class="btn btn-primary" id="mp-vote-btn"><span>🗳️</span> הצבע למפלגה זו</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ENVELOPE FULLSCREEN ANIMATION OVERLAY -->
   <div class="envelope-screen-overlay" id="envelope-anim-overlay">
     <div class="anim-envelope-stage">
-      <!-- Ballot Slip Flying into Envelope -->
       <div class="anim-paper-slip" id="anim-slip">
         <div style="font-size: 3rem; font-weight: 900; color: #000; line-height: 1;" id="anim-slip-letter">מחל</div>
         <div style="font-size: 0.85rem; font-weight: 800; color: #1f2937; margin-top: 0.6rem; text-align: center;" id="anim-slip-name">הליכוד</div>
       </div>
-
-      <!-- Envelope Body -->
       <div class="anim-envelope-body">
         <div class="anim-envelope-label">🇮🇱 מעטפת הצבעה חשאית - מדינת ישראל</div>
       </div>
-
-      <!-- Envelope Flap & Wax Seal -->
       <div class="anim-envelope-flap" id="anim-flap"></div>
       <div class="anim-envelope-seal" id="anim-seal">🇮🇱</div>
     </div>
-
-    <!-- Success Message -->
-    <div class="anim-success-msg" id="anim-msg">
-      ✓ הצבעתך התקבלה בהצלחה!
-    </div>
+    <div class="anim-success-msg" id="anim-msg">✓ הצבעתך התקבלה בהצלחה!</div>
   </div>
 
   <!-- SHARE LINK MODAL -->
@@ -1217,50 +1260,40 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3>שיתוף קישור לאתר הבחירות</h3>
-        <button class="modal-close" onclick="closeShareModal()">&times;</button>
+        <button class="btn" style="background: transparent; color: #fff; font-size: 1.5rem;" onclick="closeShareModal()">&times;</button>
       </div>
-      <div class="modal-body">
-        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
-          שתף את הקישור עם חברים, משפחה וברשתות כדי שיוכלו להצביע ולהשפיע!
-        </p>
+      <div style="padding: 1.5rem; text-align: center;">
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem;">שתף את הקישור עם חברים כדי שיצביעו וישפיעו:</p>
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
           <input type="text" id="share-link-input" readonly value="" style="flex: 1; padding: 0.65rem 0.85rem; border: 1.5px solid var(--border); border-radius: 8px; direction: ltr;">
           <button class="btn btn-primary" onclick="copyShareLink()">📋 העתק</button>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 0.5rem; margin-bottom: 1.25rem;">
           <a id="share-whatsapp" href="#" target="_blank" class="btn btn-outline" style="background: #25d366; color: #fff; border-color: #25d366;">💬 וואטסאפ</a>
           <a id="share-telegram" href="#" target="_blank" class="btn btn-outline" style="background: #0088cc; color: #fff; border-color: #0088cc;">✈️ טלגרם</a>
-          <a id="share-twitter" href="#" target="_blank" class="btn btn-outline" style="background: #1da1f2; color: #fff; border-color: #1da1f2;">🐦 טוויטר / X</a>
+          <a id="share-twitter" href="#" target="_blank" class="btn btn-outline" style="background: #1da1f2; color: #fff; border-color: #1da1f2;">🐦 טוויטר</a>
         </div>
-        <div style="text-align: center;">
-          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">סריקה בנייד להצבעה מהירה:</div>
-          <div id="qr-code-box" style="display: inline-block; padding: 0.5rem; background: #fff; border: 1px solid var(--border); border-radius: 8px;"></div>
-        </div>
+        <div id="qr-code-box" style="display: inline-block; padding: 0.5rem; background: #fff; border: 1px solid var(--border); border-radius: 8px;"></div>
       </div>
-      <div class="modal-footer">
+      <div style="padding: 1rem 1.5rem; background: #f8fafc; border-top: 1px solid var(--border); text-align: left;">
         <button class="btn btn-outline" onclick="closeShareModal()">סגור</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
+  <!-- Toast -->
   <div class="toast" id="toast-notification">✓ הודעה</div>
 
   <!-- Footer -->
   <footer>
-    <div style="max-width: 1350px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <strong>מערכת הבחירות לכנסת ה-26 | 27 באוקטובר 2026</strong> &bull; פותח עבור הדמיית קלפי רשמית בישראל
-      </div>
-      <div>
-        <span>הצבעה אחת ל-IP</span> &bull; <span>חוק בדר-עופר (120 מנדטים)</span> &bull; <span>אחוז חסימה 3.25%</span>
-      </div>
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div><strong>מערכת הבחירות לכנסת ה-26 | 27 באוקטובר 2026</strong> &bull; הדמיית קלפי רשמית</div>
+      <div><span>הצבעה אחת ל-IP</span> &bull; <span>חוק בדר-עופר עם הסכמי עודפים</span> &bull; <span>שקפי מצע מפלגתיים</span></div>
     </div>
   </footer>
 
-  <!-- SCRIPT: APPLICATION LOGIC & BALLOT OBJECT MODEL -->
+  <!-- SCRIPT -->
   <script>
-    // 1. Official List of Parties for 2026
     const PARTIES = [
   {
     "id": "mahal",
@@ -1270,7 +1303,14 @@
     "leader": "בנימין נתניהו",
     "color": "#1877f2",
     "bloc": "right",
-    "ballot_sub": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה"
+    "ballot_sub": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה",
+    "surplus_partner": "tet",
+    "platform": {
+      "security": "הכרעה צבאית מוחלטת נגד הטרור, פירוק חמאס, שמירת חופש פעולה ביטחוני בכל הגזרות, התנגדות למדינה פלסטינית והרחבת הסכמי אברהם.",
+      "economy": "כלכלת שוק חופשי, עידוד יזמות והייטק, הפחתת רגולציה ומסים, השקעה מסיבית בתשתיות לאומיות והורדת יוקר המחיה.",
+      "education": "חיזוק החינוך הלאומי והציוני, הרחבת חינוך חינם לגילאי 0-3, שיפור מעמד המורה ומצוינות מדעית וטכנולוגית.",
+      "enlistment": "הסדרת מעמד בני הישיבות בהסכמה והדרגתיות, שילוב מסלולים ייעודיים לחרדים בצה\"ל ובשירות אזרחי תוך שימור עולם התורה."
+    }
   },
   {
     "id": "po",
@@ -1280,7 +1320,14 @@
     "leader": "יאיר לפיד",
     "color": "#00a3e0",
     "bloc": "center_left",
-    "ballot_sub": "יש עתיד בראשות יאיר לפיד"
+    "ballot_sub": "יש עתיד בראשות יאיר לפיד",
+    "surplus_partner": "ken",
+    "platform": {
+      "security": "ביטחון אקטיבי, ברית אסטרטגית עם ארה\"ב, קואליציה בינלאומית מול איראן, והיפרדות ביטחונית מהפלסטינים לשמירה על רוב יהודי ודמוקרטי.",
+      "economy": "כלכלה ליברלית ומודרנית, מלחמה במונופולים וביוקר המחיה, קיצוץ משרדי ממשלה מיותרים, ותמיכה במעמד הביניים ובעסקים קטנים.",
+      "education": "חובת לימודי ליב\"ה (מתמטיקה, אנגלית ומדעים) בכל מוסד מתוקצב, תקצוב דיפרנציאלי, והעצמת מערכת החינוך הממלכתית.",
+      "enlistment": "חוק גיוס שוויוני לכולם הכולל סנקציות כלכליות ואישיות על משתמטים, ביטול פטורים גורפים, ושירות צבאי או לאומי לכל צעיר."
+    }
   },
   {
     "id": "ken",
@@ -1290,7 +1337,14 @@
     "leader": "בני גנץ",
     "color": "#002b49",
     "bloc": "center_left",
-    "ballot_sub": "כחול לבן המחנה הממלכתי בהנהגת בני גנץ"
+    "ballot_sub": "כחול לבן המחנה הממלכתי בהנהגת בני גנץ",
+    "surplus_partner": "po",
+    "platform": {
+      "security": "עליונות ביטחונית נחרצת, חיזוק צה\"ל וזרועות הביטחון, שמירה על בקעת הירדן וגושי ההתיישבות, ומדיניות יוזמת לשימור בריתות אזוריות.",
+      "economy": "כלכלה אחראית וממלכתית, השקעה במנועי צמיחה בפריפריה, מלחמה בריכוזיות, ותמיכה חסרת תקדים במשרתי המילואים ובמשפחותיהם.",
+      "education": "ממלכתיות בחינוך, חיזוק החינוך המדעי והמקצועי, העלאת שכר המורים, והקניית מיומנויות תעסוקה ומדע לכלל המגזרים.",
+      "enlistment": "מתווה שירות ישראלי רחב: מנהלת שירות לאומית שתחייב גיוס של חרדים וערבים לצבא או לארגוני הצלה וחסד, ושלילת הטבות ממי שאינו משרת."
+    }
   },
   {
     "id": "rak",
@@ -1300,7 +1354,14 @@
     "leader": "נפתלי בנט",
     "color": "#2563eb",
     "bloc": "center_left",
-    "ballot_sub": "ביחד בראשות נפתלי בנט"
+    "ballot_sub": "ביחד בראשות נפתלי בנט",
+    "surplus_partner": "derech",
+    "platform": {
+      "security": "יוזמה והתקפיות ביטחונית, הכאת ראש התמנון האיראני, שיקום עוטף עזה והצפון, ובניית צה\"ל כצבא גדול, טכנולוגי וקטלני.",
+      "economy": "כלכלה חופשית ויזמית, רפורמות עומק להפחתת מיסוי, שבירת קרטלים ומכסי מגן, והובלה עולמית בבינה מלאכותית ואנרגיה.",
+      "education": "זינוק למצוינות מתמטית וטכנולוגית, חיזוק ערכי הציונות והערבות ההדדית, ושילוב לימודי ליב\"ה ומקצועות העתיד בכל זרמי החינוך.",
+      "enlistment": "הרחבת שורות צה\"ל בדחיפות: גיוס חטיבות חרדיות לוחמות, אכיפת חוק גיוס אפקטיבי ללא פשרות, והוקרה חסרת תקדים ללוחמים."
+    }
   },
   {
     "id": "derech",
@@ -1310,7 +1371,14 @@
     "leader": "גדי איזנקוט",
     "color": "#4f46e5",
     "bloc": "center_left",
-    "ballot_sub": "ישר בראשות גדי איזנקוט"
+    "ballot_sub": "ישר בראשות גדי איזנקוט",
+    "surplus_partner": "rak",
+    "platform": {
+      "security": "תפיסת ביטחון לאומי מעודכנת, סדר עדיפויות אסטרטגי ברור, שיקום האמון בפיקוד הצבאי, והסדרה מדינית עם בנות הברית במזרח התיכון.",
+      "economy": "תקציב ביטחון אחראי ומבוקר, הסטת משאבים לצמיחה אזרחית, מאבק בריכוזיות במשק והקלה דרמטית ביוקר הדיור והמחיה.",
+      "education": "חינוך לדמוקרטיה, שלטון החוק ואזרחות פעילה, סגירת פערים בין מרכז לפריפריה, והבטחת השכלה איכותית לכל תלמיד.",
+      "enlistment": "חובת גיוס ברורה ומוחלטת לכל אזרח יהודי: צה\"ל הוא צבא העם, אין מקום לאפליית דם, ועמידה על יעדי גיוס שנתיים קשיחים עם סנקציות."
+    }
   },
   {
     "id": "emet",
@@ -1320,7 +1388,14 @@
     "leader": "יאיר גולן",
     "color": "#008850",
     "bloc": "center_left",
-    "ballot_sub": "הדמוקרטים בראשות יאיר גולן"
+    "ballot_sub": "הדמוקרטים בראשות יאיר גולן",
+    "surplus_partner": null,
+    "platform": {
+      "security": "ביטחון מבוסס עוצמה צבאית וחתירה להסדר מדיני אזורי מתואם, סיום הסכסוך על בסיס שתי מדינות, ושיקום ההרתעה הדמוקרטית הישראלית.",
+      "economy": "סוציאל-דמוקרטיה מתקדמת: חיזוק מדינת הרווחה, הגדלת שכר המינימום, פיקוח על מחירי מוצרי יסוד ודיור בר-השגה לכולם.",
+      "education": "חינוך ציבורי שוויוני וחינמי מגיל לידה ועד תואר אקדמי, שלילת תקציבים ממוסדות שאינם מלמדים ליב\"ה ומדעים, וחינוך לשוויון זכויות.",
+      "enlistment": "גיוס חובה שוויוני לכל חלקי החברה הישראלית, ביטול גורף של חוקי פטור לחרדים, הטלת סנקציות אישיות ומניעת קצבאות ממשתמטים."
+    }
   },
   {
     "id": "tet",
@@ -1330,7 +1405,14 @@
     "leader": "בצלאל סמוטריץ' ומשה פייגלין",
     "color": "#e87722",
     "bloc": "right",
-    "ballot_sub": "מפלגת הציונות הדתית וזהות בראשות סמוטריץ' ופייגלין"
+    "ballot_sub": "מפלגת הציונות הדתית וזהות בראשות סמוטריץ' ופייגלין",
+    "surplus_partner": "mahal",
+    "platform": {
+      "security": "החלת ריבונות ישראלית מלאה על כל יהודה, שומרון ועזה, שלילת כל רעיון של מדינה פלסטינית, הכרעה צבאית טוטאלית ועידוד הגירה מרצון.",
+      "economy": "שוק חופשי מוחלט, ביטול מונופולים ממשלתיים, הפרטת חברות ממשלתיות, הפחתת מסים וצמצום כוחם של ועדי העובדים הגדולים.",
+      "education": "חיזוק החינוך הדתי-לאומי והתורני, העמקת לימודי תנ\"ך ומורשת יהודית, והטמעת גאווה לאומית בכל שכבות הגיל.",
+      "enlistment": "הצדעה לחיילי הציונות הדתית ולמילואימניקים המשרתים בחזית, קידום מסגרות מותאמות לשילוב חרדים, והגנה על לימוד התורה כמגן רוחני של העם."
+    }
   },
   {
     "id": "bet",
@@ -1340,7 +1422,14 @@
     "leader": "איתמר בן גביר",
     "color": "#c8102e",
     "bloc": "right",
-    "ballot_sub": "עוצמה יהודית בראשות איתמר בן גביר"
+    "ballot_sub": "עוצמה יהודית בראשות איתמר בן גביר",
+    "surplus_partner": null,
+    "platform": {
+      "security": "עונש מוות למחבלים, גירוש תומכי טרור, חופש פעולה מלא ללוחמים ושוטרים, הקמת משמר לאומי עוצמתי והשבת הריבונות והביטחון האישי.",
+      "economy": "הורדת מיסים, תמיכה בעסקים בנגב ובגליל, מתן עדיפות כלכלית ומענקים מוגדלים ללוחמים ולמשוחררי צה\"ל.",
+      "education": "חיזוק תכני זהות יהודית, ציונות וערכי לחימה בבתי הספר, והסרת תכנים פרוגרסיביים ממערכת החינוך.",
+      "enlistment": "שירות צבאי כחובה לאומית לכל יהודי תוך התאמת תנאים לחרדים, החמרת תנאי האסירים הביטחוניים, וביטול כל פטור למי שמסית נגד המדינה."
+    }
   },
   {
     "id": "shas",
@@ -1350,7 +1439,14 @@
     "leader": "אריה דרעי",
     "color": "#2c3e50",
     "bloc": "right",
-    "ballot_sub": "התאחדות הספרדים שומרי תורה תנועת ש\"ס"
+    "ballot_sub": "התאחדות הספרדים שומרי תורה תנועת ש\"ס",
+    "surplus_partner": "gimel",
+    "platform": {
+      "security": "עמדה ביטחונית נצית פרגמטית, שמירה על ביטחון ישראל ואזרחיה תוך התייעצות מתמדת עם מועצת חכמי התורה והדאגה לפריפריה.",
+      "economy": "סוציאל-כלכלה מובהקת למען השכבות החלשות, כרטיסי מזון, סבסוד תחבורה ציבורית, מענקי חימום והעלאת קצבאות הבטחת הכנסה.",
+      "education": "תקצוב שוויוני מלא לרשת החינוך 'בני יוסף' ולמוסדות התורניים, חיזוק מורשת יהדות ספרד והנחלת ערכי מסורת ויהדות.",
+      "enlistment": "שמירה מוחלטת על מעמדם של לומדי התורה 'תורתם אומנותם', התנגדות נחרצת לסנקציות פליליות, ונכונות להסדרת מסלולים רק למי שאינו לומד."
+    }
   },
   {
     "id": "gimel",
@@ -1360,7 +1456,14 @@
     "leader": "יצחק גולדקנופף ומשה גפני",
     "color": "#34495e",
     "bloc": "right",
-    "ballot_sub": "יהדות התורה והשבת אגודת ישראל - דגל התורה"
+    "ballot_sub": "יהדות התורה והשבת אגודת ישראל - דגל התורה",
+    "surplus_partner": "shas",
+    "platform": {
+      "security": "התמקדות בביטחון העם היהודי בארצו על פי הדרכת גדולי ישראל, שמירה על הסטטוס קוו הדתי והימנעות מעימותים בינלאומיים מיותרים.",
+      "economy": "תקציבים לעולם הישיבות, פתרונות דיור מוזלים בריכוזים חרדיים, סבסוד מעונות יום ותמיכה במשפחות ברוכות ילדים.",
+      "education": "אוטונומיה חינוכית מלאה למוסדות החינוך החרדי ללא התערבות בתכני הלימוד, והשוואת תקציבי תלמיד ישיבה לתלמיד במערכת הכללית.",
+      "enlistment": "לימוד התורה הוא ערך עליון המגן על עם ישראל; דרישה לעיגון חוקי פטור מלא לכל בחור ישיבה שלומד, ודחייה מוחלטת של יעדי גיוס כפויים."
+    }
   },
   {
     "id": "lamed",
@@ -1370,7 +1473,14 @@
     "leader": "אביגדור ליברמן",
     "color": "#005596",
     "bloc": "right",
-    "ballot_sub": "ישראל ביתנו בראשות אביגדור ליברמן"
+    "ballot_sub": "ישראל ביתנו בראשות אביגדור ליברמן",
+    "surplus_partner": "day",
+    "platform": {
+      "security": "קו ביטחוני תקיף ובלתי מתפשר, חיסול ראשי ארגוני הטרור, עונש מוות למחבלים, והצבת אולטימטום ברור מול חמאס, חיזבאללה ואיראן.",
+      "economy": "כלכלה יצרנית וצומחת, עידוד יציאה לעבודה, שלילת קצבאות ממי שמסרב לעבוד, והורדת מיסים למעמד הביניים והעובדים.",
+      "education": "חינוך ממלכתי איכותי, שלילת תקציבים ממוסד שלא מלמד 100% לימודי ליב\"ה ומדעים, והשקעה באקדמיה ובטכנולוגיה.",
+      "enlistment": "חוק גיוס אחד לכולם בגיל 18: יהודי, מוסלמי, נוצרי, דרוזי, חרדי וחילוני – כולם משרתים בצה\"ל או בשירות אזרחי מלא ללא יוצא מן הכלל."
+    }
   },
   {
     "id": "am",
@@ -1380,7 +1490,14 @@
     "leader": "מנסור עבאס",
     "color": "#007a3d",
     "bloc": "arab",
-    "ballot_sub": "רע\"ם - הרשימה הערבית המאוחדת"
+    "ballot_sub": "רע\"ם - הרשימה הערבית המאוחדת",
+    "surplus_partner": null,
+    "platform": {
+      "security": "סיום הכיבוש והקמת מדינה פלסטינית לצד ישראל, חתירה לשלום צודק וכולל, והתמקדות בהשגת ביטחון פנים ומיגור הפשיעה בחברה הערבית.",
+      "economy": "פיתוח כלכלי אזרחי לחברה הערבית, הקצאת תקציבי תוכניות החומש, הרחבת אזורי תעשייה ופתרונות תעסוקה לאקדמאים ערבים.",
+      "education": "שדרוג בתי הספר הערביים, חיזוק החינוך הטכנולוגי והמדעי, פתרון מצוקת הכיתות, ושימור השפה והזהות התרבותית הערבית.",
+      "enlistment": "התנגדות עקרונית לגיוס צעירים ערבים לצה\"ל, תמיכה בשירות אזרחי התנדבותי בתוך היישובים הערביים בלבד לרווחת הקהילה."
+    }
   },
   {
     "id": "vdm",
@@ -1390,7 +1507,14 @@
     "leader": "איימן עודה ואחמד טיבי",
     "color": "#d9232a",
     "bloc": "arab",
-    "ballot_sub": "חד\"ש - תע\"ל בראשות איימן עודה ואחמד טיבי"
+    "ballot_sub": "חד\"ש - תע\"ל בראשות איימן עודה ואחמד טיבי",
+    "surplus_partner": null,
+    "platform": {
+      "security": "סיום מיידי של המלחמה והכיבוש, הקמת מדינה פלסטינית עצמאית שבירתה מזרח ירושלים, פירוק ההתנחלויות וחתירה לשלום צודק.",
+      "economy": "צדק חלוקתי וכלכלה סוציאליסטית: מיסוי עשירים ותאגידים, הגנה על זכויות עובדים, והשוואת תשתיות מלאה ליישובים הערביים.",
+      "education": "חינוך שוויוני, ביטול אפליה בתקציבים, חיזוק החינוך לדו-קיום, דמוקרטיה וזכויות אדם, ופיתוח תוכניות לימוד בערבית.",
+      "enlistment": "התנגדות מוחלטת לכל סוגי הגיוס לצבא או לשירות לאומי-אזרחי ככלי לשליטה, ומאבק לזכויות אזרחיות מלאות ללא תלות בשירות."
+    }
   },
   {
     "id": "dalet",
@@ -1400,7 +1524,14 @@
     "leader": "סאמי אבו שחאדה",
     "color": "#f58220",
     "bloc": "arab",
-    "ballot_sub": "בל\"ד - אלתג'מוע אלדמוקרטי"
+    "ballot_sub": "בל\"ד - אלתג'מוע אלדמוקרטי",
+    "surplus_partner": null,
+    "platform": {
+      "security": "הפיכת ישראל למדינת כל אזרחיה, ביטול חוק הלאום, סיום הכיבוש והכרה בזכות ההגדרה העצמית של העם הפלסטיני.",
+      "economy": "שוויון כלכלי מוחלט, ביטול הפקעת קרקעות, תכנון ובנייה שוויוניים ביישובים הערביים, והשקעה מסיבית בתשתיות.",
+      "education": "ניהול עצמאי של מערכת החינוך הערבית, שימור הנרטיב והזהות הלאומית הפלסטינית, והעמקת החינוך האקדמי.",
+      "enlistment": "התנגדות מלאה ונחרצת לגיוס צבאי או שירות אזרחי כלשהו, והגדרת האזרחות כזכות יסוד שאינה מותנית בחובת שירות."
+    }
   },
   {
     "id": "ni",
@@ -1410,7 +1541,14 @@
     "leader": "אבי מעוז",
     "color": "#854d0e",
     "bloc": "right",
-    "ballot_sub": "נעם לישראל בראשות אבי מעוז"
+    "ballot_sub": "נעם לישראל בראשות אבי מעוז",
+    "surplus_partner": null,
+    "platform": {
+      "security": "ביטחון מתוך גאווה יהודית ואמונית, ניצחון מוחלט על האויב, ביטול פקודות השירות המשותף בצה\"ל וחיזוק רוח הלחימה היהודית.",
+      "economy": "תמיכה במשפחה היהודית המסורתית, הקלות במס למשפחות עם ילדים, ועידוד תעסוקה תוך שמירת השבת במרחב הציבורי.",
+      "education": "טיהור תוכניות הלימוד מהשפעות פוסט-מודרניות ופרוגרסיביות, חיזוק הזהות והמורשת היהודית האורתודוקסית במערכת החינוך.",
+      "enlistment": "שירות צבאי קרבי ומסורתי, הקפדה יתרה על הפרדה מגדרית וקדושת המחנה בצה\"ל, והגנה על תלמידי הישיבות."
+    }
   },
   {
     "id": "day",
@@ -1420,7 +1558,14 @@
     "leader": "יועז הנדל וירון זליכה",
     "color": "#0d9488",
     "bloc": "other",
-    "ballot_sub": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה"
+    "ballot_sub": "המילואימניקים והכלכלית בראשות יועז הנדל וירון זליכה",
+    "surplus_partner": "lamed",
+    "platform": {
+      "security": "יד ברזל ביטחונית, הכרעת אויבי ישראל, הגדלת סדר הכוחות של צה\"ל ב-30%, ומתן עדיפות לאומית ראשונה ללוחמי המילואים.",
+      "economy": "מלחמה חסרת פשרות במונופולים וביבואנים הבלעדיים, פירוק קרטלים, הורדת מע\"מ על מזון ותרופות, ומענקים משמעותיים למשרתים.",
+      "education": "חינוך ממלכתי איכותי, הטמעת לימודי ליב\"ה ומדעים בכל בתי הספר ללא פשרות, והקניית מיומנויות טכנולוגיות וכלכליות.",
+      "enlistment": "חובת שירות קרבי או לאומי שוויוני לכולם; ביטול מוחלט של קומבינות הפטור, והתניית זכויות והטבות מדינה בביצוע שירות פעיל."
+    }
   },
   {
     "id": "kach",
@@ -1430,7 +1575,14 @@
     "leader": "עופר וינטר",
     "color": "#15803d",
     "bloc": "right",
-    "ballot_sub": "עמך ישראל בראשות עופר וינטר"
+    "ballot_sub": "עמך ישראל בראשות עופר וינטר",
+    "surplus_partner": null,
+    "platform": {
+      "security": "הכרעה, תעוזה ורוח לחימה יהודית, חתירה למגע וניצחון ללא גמגום, שינוי הוראות פתיחה באש ומתן גיבוי מלא ללוחמים בשטח.",
+      "economy": "דאגה לאזרח הפשוט ולפריפריה, פיתוח יישובי הספר וההתיישבות, והקלות כלכליות לחיילים ולמשפחות המילואים.",
+      "education": "חינוך לגבורה, לאהבת העם והארץ, חיבור עמוק לשורשים ולתנ\"ך לצד מצוינות אישית ומנהיגות.",
+      "enlistment": "עידוד גיוס משמעותי מכל חלקי העם, יצירת מסלולי לחימה מותאמים לחרדים תוך שמירה מלאה על אורח חייהם ואמונתם."
+    }
   },
   {
     "id": "yod",
@@ -1440,7 +1592,14 @@
     "leader": "שרן השכל",
     "color": "#7e22ce",
     "bloc": "other",
-    "ballot_sub": "ישראל תחילה בראשות שרן השכל"
+    "ballot_sub": "ישראל תחילה בראשות שרן השכל",
+    "surplus_partner": null,
+    "platform": {
+      "security": "ביטחון לאומי פרגמטי, חיזוק מעמד ישראל בעולם, הידוק שיתופי פעולה אזוריים והגנה תקיפה על גבולות המדינה.",
+      "economy": "ליברליזם כלכלי אמיתי, חופש עיסוק, לגליזציה של קנאביס, פתיחת השוק לייבוא חופשי והורדת מכסים להפחתת יוקר המחיה.",
+      "education": "אוטונומיה למנהלים ולבתי הספר, שיטת שוברים (Vouchers) בחינוך להגברת תחרות ומצוינות, ושילוב מדעים וליב\"ה.",
+      "enlistment": "מעבר הדרגתי לצבא מקצועי מתוגמל היטב בשכר גבוה ללוחמים, לצד שירות לאומי-אזרחי חובה לכל יתר האוכלוסייה."
+    }
   },
   {
     "id": "hei",
@@ -1450,71 +1609,106 @@
     "leader": "ישוע ישראל בן דוד",
     "color": "#14b8a6",
     "bloc": "other",
-    "ballot_sub": "גן עדן בראשות ישוע ישראל בן דוד"
+    "ballot_sub": "גן עדן בראשות ישוע ישראל בן דוד",
+    "surplus_partner": null,
+    "platform": {
+      "security": "הגנה רוחנית וביטחונית על ארץ הקודש, שלום ואחדות בין כל תושבי הארץ מתוך חסד ואמונה.",
+      "economy": "חלוקת משאבים צודקת, סיוע לנזקקים ולחסרי בית, וביטול ריבית ועושק כלכלי.",
+      "education": "חינוך לערכי חסד, מוסר, אהבת הזולת וקדושת החיים מגיל צעיר.",
+      "enlistment": "שירות של חסד והצלת חיים, סיוע לחלשים ולפצועים, והתנדבות קהילתית רחבה."
+    }
   },
   {
     "id": "zach",
     "letter": "זך",
-    "name": "צעירים בוערים",
+    "name": "צעירים בוערים בראשות הדר מוכתר",
     "short": "צעירים בוערים",
     "leader": "הדר מוכתר",
     "color": "#ea580c",
     "bloc": "other",
-    "ballot_sub": "צעירים בוערים"
+    "ballot_sub": "צעירים בוערים בראשות הדר מוכתר",
+    "surplus_partner": null,
+    "platform": {
+      "security": "ביטחון המדינה חייב להגן קודם כל על עתיד הדור הצעיר ולוחמי המילואים, ללא פוליטיקה ואינטרסים צרים.",
+      "economy": "מלחמת חורמה במחירי הדיור המטורפים, פיקוח על שכר דירה, שבירת מונופול המזון ומתן אפשרות לצעירים לקנות דירה בישראל.",
+      "education": "חינוך פיננסי מעשי בבתי הספר, לימודי שוק ההון ויזמות, ומלגות מחיה מלאות לסטודנטים וללוחמים משוחררים.",
+      "enlistment": "מי שמשרת מקבל: דירה בהנחה ענקית, לימודים חינם ופטור ממס; שוויון בנטל שבו כולם נושאים באחריות לעתיד המדינה."
+    }
   },
   {
     "id": "blank",
     "letter": "פתק לבן",
     "name": "פתק לבן (הצבעת מחאה / קול פסול)",
     "short": "פתק לבן",
-    "leader": "קול פסול",
+    "leader": "ללא מנהיג",
     "color": "#9ca3af",
     "bloc": "invalid",
-    "ballot_sub": "פתק לבן ריק - ללא אותיות"
+    "ballot_sub": "פתק לבן ריק - ללא אותיות וללא כינוי",
+    "surplus_partner": null,
+    "platform": {
+      "security": "הצבעת מחאה: אי-אמון במערכת הביטחונית או בפתרונות המוצעים על ידי המפלגות הקיימות.",
+      "economy": "הבעת ייאוש מיוקר המחיה ומהבטחות כלכליות של נבחרי הציבור שאינן ממומשות.",
+      "education": "קריאה לרה-ארגון יסודי של סדרי העדיפויות הלאומיים ומערכת הממשל בישראל.",
+      "enlistment": "פתק לבן אינו נספר בחלוקת המנדטים ונחשב כקול פסול על פי חוק הבחירות לכנסת."
+    }
   }
 ];
 
-    // State Variables
     let currentIP = "192.168.1.101";
     let categoryFilter = "all";
     let ballotObjects = [];
 
-    // Local Storage Keys
     const STORAGE_KEY_VOTES = "il_election_votes";
     const STORAGE_KEY_IPS = "il_election_voted_ips";
     const STORAGE_KEY_CURRENT_IP = "il_election_simulated_ip";
 
     // ==============================================================
-    // DISTINCT BALLOT SLIP OBJECT MODEL (אובייקט פתק הצבעה נפרד)
+    // BALLOT SLIP COMPONENT CLASS WITH PLATFORM POPUP & SURPLUS
     // ==============================================================
     class BallotSlip {
-      constructor(partyData) {
-        this.id = partyData.id;
-        this.letter = partyData.letter;
-        this.name = partyData.name;
-        this.short = partyData.short;
-        this.leader = partyData.leader;
-        this.color = partyData.color;
-        this.bloc = partyData.bloc;
-        this.ballot_sub = partyData.ballot_sub || partyData.name;
+      constructor(data) {
+        this.id = data.id;
+        this.letter = data.letter;
+        this.name = data.name;
+        this.short = data.short;
+        this.leader = data.leader;
+        this.color = data.color;
+        this.bloc = data.bloc;
+        this.ballot_sub = data.ballot_sub || data.name;
+        this.surplus_partner = data.surplus_partner;
+        this.platform = data.platform || {};
         this.lastTapTime = 0;
       }
 
-      // Render the distinct DOM component for this ballot slip
+      getPartnerName() {
+        if (!this.surplus_partner) return "ללא הסכם עודפים";
+        const p = PARTIES.find(x => x.id === this.surplus_partner);
+        return p ? `${p.short} (${p.letter})` : "ללא הסכם";
+      }
+
       renderElement() {
         const card = document.createElement("div");
         card.className = "ballot-slip-card" + (this.id === "blank" ? " blank-slip" : "");
         card.id = "ballot-card-" + this.id;
-        card.setAttribute('data-party-id', this.id);
-        card.title = "דאבל-קליק להכנסת הפתק למעטפה והצבעה מיידית";
+        card.setAttribute("data-party-id", this.id);
+        card.title = "לחיצה כפולה להטלת הפתק למעטפה והצבעה ישירה";
+
+        // Desktop Hover triggers Platform Slide
+        card.addEventListener("mouseenter", (e) => {
+          showFloatingPlatform(this, card);
+        });
+        card.addEventListener("mouseleave", () => {
+          hideFloatingPlatform();
+        });
 
         // Double Click on PC
         card.addEventListener("dblclick", (e) => {
           e.stopPropagation();
+          hideFloatingPlatform();
           this.submitVote();
         });
 
-        // Touch double-tap support on Mobile
+        // Double Tap on Mobile
         card.addEventListener("touchend", (e) => {
           const now = new Date().getTime();
           const diff = now - this.lastTapTime;
@@ -1532,41 +1726,41 @@
         else if (this.id === "rak" || this.id === "derech" || this.bloc === "other") catBadge = "רשימה חדשה (2026)";
 
         card.innerHTML = `
-          <div class="ballot-official-tag">${catBadge}</div>
+          <div class="ballot-top-bar">
+            <span class="ballot-official-tag">${catBadge}</span>
+            <button class="platform-info-btn" onclick="openPlatformModalById('${this.id}', event)">👁️ מצע</button>
+          </div>
           <div class="ballot-letter-huge">${this.letter}</div>
           <div class="ballot-official-name">${this.ballot_sub}</div>
-          <div class="ballot-dblclick-trigger">⚡ לחיצה כפולה להטלה למעטפה</div>
+          <div class="ballot-card-actions">
+            <button class="ballot-action-vote" onclick="event.stopPropagation(); triggerVoteFromCard('${this.id}')">
+              ⚡ הצבע עכשיו (דאבל קליק)
+            </button>
+          </div>
         `;
 
         return card;
       }
 
-      // Execute vote submission for this ballot object
       async submitVote() {
         if (hasCurrentIPVoted()) {
           showToast("⛔ לא ניתן להצביע שנית: כתובת ה-IP שלך כבר הצביעה במערכת זו!", "error");
           return;
         }
 
-        // Prepare vote form payload
         const votePayload = {
           party_id: this.id,
           letter: this.letter,
           name: this.name,
           short: this.short,
-          ballot_sub: this.ballot_sub,
           voter_ip: currentIP,
           timestamp: new Date().toISOString()
         };
 
-        // Trigger the envelope animation immediately
         this.playEnvelopeAnimation();
-
-        // Send to backend database (or local database in standalone mode)
         await this.sendVoteToDatabase(votePayload);
       }
 
-      // Play smooth envelope insertion animation
       playEnvelopeAnimation() {
         const overlay = document.getElementById("envelope-anim-overlay");
         const animSlip = document.getElementById("anim-slip");
@@ -1579,7 +1773,6 @@
         animLetter.textContent = this.letter;
         animName.textContent = this.short;
 
-        // Reset animation states
         animSlip.classList.remove("slide-in");
         animFlap.classList.remove("close-flap");
         animSeal.classList.remove("show-seal");
@@ -1587,49 +1780,30 @@
 
         overlay.classList.add("active");
 
-        // 1. Slip slides into envelope
-        setTimeout(() => {
-          animSlip.classList.add("slide-in");
-        }, 150);
-
-        // 2. Flap closes
-        setTimeout(() => {
-          animFlap.classList.add("close-flap");
-        }, 900);
-
-        // 3. Wax seal and success message appear
+        setTimeout(() => animSlip.classList.add("slide-in"), 150);
+        setTimeout(() => animFlap.classList.add("close-flap"), 900);
         setTimeout(() => {
           animSeal.classList.add("show-seal");
           animMsg.classList.add("show-msg");
         }, 1200);
 
-        // 4. Transition to receipt view
         setTimeout(() => {
           overlay.classList.remove("active");
           showReceipt(this);
         }, 2400);
       }
 
-      // Send vote form data to database (REST API / LocalStorage)
       async sendVoteToDatabase(payload) {
-        // If served over HTTP, submit form via fetch API to Python server
         if (window.location.protocol.startsWith('http')) {
           try {
-            const res = await fetch('/api/vote', {
+            await fetch('/api/vote', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ party_id: this.id })
             });
-            if (!res.ok) {
-              const err = await res.json();
-              console.warn("Server vote note:", err);
-            }
-          } catch (e) {
-            console.log("Client fallback active");
-          }
+          } catch (e) {}
         }
 
-        // Record in local persistent storage database
         const votes = getStoredVotes();
         votes[this.id] = (votes[this.id] || 0) + 1;
         saveVotes(votes);
@@ -1649,303 +1823,374 @@
       }
     }
 
+    // ==============================================================
+    // FLOATING & MODAL PLATFORM SLIDE DISPLAY
+    // ==============================================================
+    let floatingTimeout = null;
+
+    function showFloatingPlatform(ballot, cardEl) {
+      if (window.innerWidth <= 768) return; // Only floating on desktop
+      clearTimeout(floatingTimeout);
+
+      const card = document.getElementById("floating-platform-card");
+      document.getElementById("fp-title").textContent = `${ballot.short} (בהנהגת ${ballot.leader})`;
+      document.getElementById("fp-sub").textContent = ballot.ballot_sub;
+      document.getElementById("fp-letter").textContent = ballot.letter;
+
+      document.getElementById("fp-sec").textContent = ballot.platform.security || "אין פירוט";
+      document.getElementById("fp-eco").textContent = ballot.platform.economy || "אין פירוט";
+      document.getElementById("fp-edu").textContent = ballot.platform.education || "אין פירוט";
+      document.getElementById("fp-enl").textContent = ballot.platform.enlistment || "אין פירוט";
+
+      const surplusText = ballot.surplus_partner 
+        ? `הסכם עודפים רשום עם: ${ballot.getPartnerName()}` 
+        : "ללא הסכם עודפים רשום";
+      document.getElementById("fp-surplus-text").textContent = surplusText;
+
+      // Position near card
+      const rect = cardEl.getBoundingClientRect();
+      const cardWidth = 460;
+      let left = rect.right + 12;
+      if (left + cardWidth > window.innerWidth) {
+        left = rect.left - cardWidth - 12;
+        if (left < 10) left = 10;
+      }
+      let top = rect.top + window.scrollY;
+
+      card.style.left = left + "px";
+      card.style.top = top + "px";
+      card.classList.add("active");
+    }
+
+    function hideFloatingPlatform() {
+      floatingTimeout = setTimeout(() => {
+        const card = document.getElementById("floating-platform-card");
+        if (card) card.classList.remove("active");
+      }, 150);
+    }
+
+    // Open Platform Modal (Mobile or Info Button)
+    function openPlatformModalById(partyId, event) {
+      if (event) event.stopPropagation();
+      const ballot = ballotObjects.find(b => b.id === partyId);
+      if (!ballot) return;
+
+      document.getElementById("mp-title").textContent = `${ballot.short} (בהנהגת ${ballot.leader})`;
+      document.getElementById("mp-sub").textContent = ballot.ballot_sub;
+      document.getElementById("mp-letter").textContent = ballot.letter;
+
+      document.getElementById("mp-sec").textContent = ballot.platform.security || "אין פירוט";
+      document.getElementById("mp-eco").textContent = ballot.platform.economy || "אין פירוט";
+      document.getElementById("mp-edu").textContent = ballot.platform.education || "אין פירוט";
+      document.getElementById("mp-enl").textContent = ballot.platform.enlistment || "אין פירוט";
+
+      const surplusText = ballot.surplus_partner 
+        ? `הסכם עודפים רשום עם: ${ballot.getPartnerName()}` 
+        : "ללא הסכם עודפים רשום";
+      document.getElementById("mp-surplus-text").textContent = surplusText;
+
+      const voteBtn = document.getElementById("mp-vote-btn");
+      voteBtn.onclick = () => {
+        closePlatformModal();
+        ballot.submitVote();
+      };
+
+      document.getElementById("platform-modal").classList.add("active");
+    }
+
+    function closePlatformModal() {
+      document.getElementById("platform-modal").classList.remove("active");
+    }
+
+    function triggerVoteFromCard(partyId) {
+      const ballot = ballotObjects.find(b => b.id === partyId);
+      if (ballot) ballot.submitVote();
+    }
+
     // Database Helpers
     function getStoredVotes() {
       const raw = localStorage.getItem(STORAGE_KEY_VOTES);
       if (!raw) return {};
       try { return JSON.parse(raw); } catch (e) { return {}; }
     }
-
-    function saveVotes(votes) {
-      localStorage.setItem(STORAGE_KEY_VOTES, JSON.stringify(votes));
-    }
-
+    function saveVotes(votes) { localStorage.setItem(STORAGE_KEY_VOTES, JSON.stringify(votes)); }
     function getVotedIPs() {
       const raw = localStorage.getItem(STORAGE_KEY_IPS);
       if (!raw) return {};
       try { return JSON.parse(raw); } catch (e) { return {}; }
     }
+    function saveVotedIPs(ips) { localStorage.setItem(STORAGE_KEY_IPS, JSON.stringify(ips)); }
+    function hasCurrentIPVoted() { return !!getVotedIPs()[currentIP]; }
 
-    function saveVotedIPs(ips) {
-      localStorage.setItem(STORAGE_KEY_IPS, JSON.stringify(ips));
-    }
-
-    function hasCurrentIPVoted() {
-      const ips = getVotedIPs();
-      return !!ips[currentIP];
-    }
-
-    // Display receipt screen
     function showReceipt(ballotObj) {
       const receiptId = "VOTE-2026-" + Math.floor(10000 + Math.random() * 90000) + "-ISR";
       const now = new Date();
       const timeStr = now.toLocaleDateString("he-IL") + " " + now.toLocaleTimeString("he-IL");
 
       document.getElementById("receipt-id").textContent = receiptId;
-      document.getElementById("receipt-party").textContent = ballotObj.short + " (" + ballotObj.letter + ")";
+      document.getElementById("receipt-party").textContent = `${ballotObj.short} (${ballotObj.letter})`;
       document.getElementById("receipt-ip").textContent = currentIP;
-      document.getElementById("receipt-time").textContent = timeStr;
 
       showToast("✓ הצבעתך התקבלה בהצלחה!", "success");
       switchView("success");
     }
 
-    // Application Initialization
-    window.addEventListener("DOMContentLoaded", () => {
-      const savedIP = localStorage.getItem(STORAGE_KEY_CURRENT_IP);
-      if (savedIP) {
-        currentIP = savedIP;
-      } else {
-        currentIP = "192.168.1." + Math.floor(Math.random() * 150 + 20);
-        localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
-      }
+    // ==============================================================
+    // BADER-OFER ALGORITHM WITH & WITHOUT SURPLUS AGREEMENTS
+    // ==============================================================
+    function runBaderOferEngine(votes, enableSurplus = true) {
+      const totalValid = Object.entries(votes).reduce((sum, [pid, v]) => pid !== "blank" ? sum + v : sum, 0);
+      if (totalValid === 0) return { seats: {}, log: [], qualifying: [] };
 
-      // Instantiate BallotSlip objects for each party
-      ballotObjects = PARTIES.map(p => new BallotSlip(p)); window.ballotObjects = ballotObjects;
+      const thresholdVotes = totalValid * 0.0325;
+      const qualifying = PARTIES.filter(p => p.id !== "blank" && (votes[p.id] || 0) >= thresholdVotes);
+      if (qualifying.length === 0) return { seats: {}, log: [], qualifying: [] };
 
-      // Check URL parameters
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("view") === "admin") switchView("admin");
-      else if (params.get("view") === "iptest") switchView("iptest");
+      const qualVotes = {};
+      qualifying.forEach(p => qualVotes[p.id] = votes[p.id] || 0);
 
-      updateIPStatusUI();
-      renderAllBallotObjects();
-      setupShareLinks();
-      generateQRCodeSVG();
-      refreshAdminResults();
-
-      // Check server IP if running via Python server
-      if (window.location.protocol.startsWith('http')) {
-        fetch('/api/ip').then(r => r.json()).then(data => {
-          if (data && data.ip) {
-            currentIP = data.ip;
-            updateIPStatusUI();
+      // Identify active surplus pairs (both must qualify)
+      const activePairs = {};
+      if (enableSurplus) {
+        const seen = new Set();
+        qualifying.forEach(p => {
+          const p1 = p.id;
+          const p2 = p.surplus_partner;
+          if (p2 && qualVotes[p2] !== undefined && !seen.has(p1) && !seen.has(p2)) {
+            activePairs[`${p1}+${p2}`] = [p1, p2];
+            seen.add(p1);
+            seen.add(p2);
           }
-        }).catch(() => {});
+        });
       }
-    });
 
-    // Render all ballot objects into the grid tray
-    function renderAllBallotObjects() {
-      const grid = document.getElementById("ballots-grid");
-      if (!grid) return;
-      grid.innerHTML = "";
+      const TOTAL_SEATS = 120;
+      const qualSum = Object.values(qualVotes).reduce((a, b) => a + b, 0);
+      const quota = qualSum / TOTAL_SEATS;
 
-      const searchTerm = (document.getElementById("voter-search")?.value || "").trim().toLowerCase();
-
-      const filtered = ballotObjects.filter(obj => {
-        if (categoryFilter === "knesset" && (obj.id === "blank" || obj.bloc === "other" || obj.id === "rak" || obj.id === "derech")) return false;
-        if (categoryFilter === "new" && (obj.bloc !== "other" && obj.id !== "rak" && obj.id !== "derech")) return false;
-        if (categoryFilter === "blank" && obj.id !== "blank") return false;
-
-        if (searchTerm) {
-          const matchLetter = obj.letter.toLowerCase().includes(searchTerm);
-          const matchName = obj.name.toLowerCase().includes(searchTerm);
-          const matchShort = obj.short.toLowerCase().includes(searchTerm);
-          const matchSub = obj.ballot_sub.toLowerCase().includes(searchTerm);
-          return matchLetter || matchName || matchShort || matchSub;
-        }
-        return true;
+      const seats = {};
+      let allocated = 0;
+      qualifying.forEach(p => {
+        seats[p.id] = Math.floor(qualVotes[p.id] / quota);
+        allocated += seats[p.id];
       });
 
-      filtered.forEach(obj => {
-        const el = obj.renderElement();
-        grid.appendChild(el);
-      });
+      const remaining = TOTAL_SEATS - allocated;
+      const log = [];
 
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: #fff; border-radius: 12px; border: 1px solid var(--border);">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
-            <h3 style="color: var(--primary);">לא נמצאו פתקי הצבעה תואמים</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">נסה לחפש אותיות אחרות או לחץ על כפתור "כל הפתקים"</p>
-          </div>
-        `;
+      function buildGroups() {
+        const groups = [];
+        const handled = new Set();
+
+        Object.entries(activePairs).forEach(([key, [p1, p2]]) => {
+          const combVotes = qualVotes[p1] + qualVotes[p2];
+          const combSeats = seats[p1] + seats[p2];
+          groups.push({
+            type: "pair",
+            key: key,
+            parties: [p1, p2],
+            votes: combVotes,
+            seats: combSeats,
+            q: combVotes / (combSeats + 1)
+          });
+          handled.add(p1);
+          handled.add(p2);
+        });
+
+        qualifying.forEach(p => {
+          if (!handled.has(p.id)) {
+            groups.push({
+              type: "solo",
+              key: p.id,
+              parties: [p.id],
+              votes: qualVotes[p.id],
+              seats: seats[p.id],
+              q: qualVotes[p.id] / (seats[p.id] + 1)
+            });
+          }
+        });
+        return groups;
       }
-    }
 
-    function filterBallots() {
-      renderAllBallotObjects();
-    }
+      for (let i = 0; i < remaining; i++) {
+        const groups = buildGroups();
+        groups.sort((a, b) => b.q - a.q);
+        const top = groups[0];
 
-    function setCategoryFilter(cat, btn) {
-      categoryFilter = cat;
-      document.querySelectorAll(".filter-pills .pill").forEach(p => p.classList.remove("active"));
-      if (btn) btn.classList.add("active");
-      renderAllBallotObjects();
-    }
-
-    // Switch Application Views
-    function switchView(viewName) {
-      document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
-      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-
-      const targetSec = document.getElementById("view-" + viewName);
-      const targetTab = document.getElementById("tab-" + viewName);
-
-      if (targetSec) targetSec.classList.add("active");
-      if (targetTab) targetTab.classList.add("active");
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-
-      if (viewName === "admin") refreshAdminResults();
-      else if (viewName === "iptest") updateIPStatusUI();
-    }
-
-    // Update IP Status UI
-    function updateIPStatusUI() {
-      const ipDisplay = document.getElementById("current-ip-display");
-      const statusPill = document.getElementById("ip-status-pill");
-
-      if (ipDisplay) ipDisplay.textContent = currentIP;
-
-      const voted = hasCurrentIPVoted();
-      if (voted) {
-        if (statusPill) {
-          statusPill.className = "voter-status-pill voted";
-          statusPill.innerHTML = "⛔ כבר הצבעת מ-IP זה";
-        }
-      } else {
-        if (statusPill) {
-          statusPill.className = "voter-status-pill can-vote";
-          statusPill.innerHTML = "✓ רשאי להצביע";
+        if (top.type === "pair") {
+          const [p1, p2] = top.parties;
+          const q1 = qualVotes[p1] / (seats[p1] + 1);
+          const q2 = qualVotes[p2] / (seats[p2] + 1);
+          const winner = q1 >= q2 ? p1 : p2;
+          seats[winner] += 1;
+          log.push({ winner, pair: top.parties, sharedQ: top.q });
+        } else {
+          const winner = top.parties[0];
+          seats[winner] += 1;
+          log.push({ winner, solo: true, q: top.q });
         }
       }
 
-      renderIPLogs();
+      return { seats, log, qualifying, activePairs, totalValid, thresholdVotes };
     }
 
-    // ==============================================================
-    // BADER-OFER KNESSET SEAT ALLOCATION (120 SEATS)
-    // ==============================================================
-    function calculateBaderOferResults() {
+    function refreshAdminResults() {
       const votes = getStoredVotes();
+      const withSurplus = runBaderOferEngine(votes, true);
+      const withoutSurplus = runBaderOferEngine(votes, false);
+
       const totalBallots = Object.values(votes).reduce((a, b) => a + b, 0);
       const blankVotes = votes["blank"] || 0;
       const validVotes = totalBallots - blankVotes;
 
-      const thresholdPct = 3.25;
-      const thresholdVotes = validVotes > 0 ? (validVotes * thresholdPct / 100.0) : 0;
+      document.getElementById("kpi-total-votes").textContent = totalBallots.toLocaleString();
+      document.getElementById("kpi-valid-votes").textContent = validVotes.toLocaleString();
+      document.getElementById("kpi-invalid-votes").textContent = blankVotes.toLocaleString();
+      document.getElementById("kpi-threshold-votes").textContent = Math.ceil(withSurplus.thresholdVotes || 0).toLocaleString();
+      document.getElementById("kpi-passed-parties").textContent = withSurplus.qualifying.length;
 
-      const qualifying = [];
-      const nonQualifying = [];
+      // 1. Render Surplus Pairs Map Cards
+      renderSurplusMapCards(withSurplus, withoutSurplus);
 
-      PARTIES.forEach(party => {
-        const count = votes[party.id] || 0;
-        const pctOfValid = validVotes > 0 ? (count / validVotes * 100) : 0;
-        const isBlank = (party.id === "blank");
+      // 2. Render Comparative Table (With vs Without Surplus)
+      renderComparisonTable(votes, withSurplus, withoutSurplus, validVotes);
 
-        const data = {
-          ...party,
-          votes: count,
-          pct: pctOfValid,
-          passed: (!isBlank && validVotes > 0 && count >= thresholdVotes),
-          seats: 0
-        };
+      // 3. Render Main Results Table
+      renderMainResultsTable(votes, withSurplus, validVotes);
 
-        if (!isBlank && data.passed) qualifying.push(data);
-        else nonQualifying.push(data);
-      });
+      // 4. Draw Knesset Arch
+      const seatList = PARTIES.map(p => ({ ...p, seats: withSurplus.seats[p.id] || 0 })).filter(p => p.seats > 0);
+      drawKnessetArch(seatList);
+    }
 
-      const TOTAL_SEATS = 120;
-      if (qualifying.length > 0 && validVotes > 0) {
-        const qualifyingVotesSum = qualifying.reduce((sum, p) => sum + p.votes, 0);
-        const generalQuota = qualifyingVotesSum / TOTAL_SEATS;
+    function renderSurplusMapCards(withS, withoutS) {
+      const container = document.getElementById("surplus-pairs-grid");
+      if (!container) return;
+      container.innerHTML = "";
 
-        let allocatedSeats = 0;
-        qualifying.forEach(p => {
-          p.seats = Math.floor(p.votes / generalQuota);
-          allocatedSeats += p.seats;
-        });
+      const pairsList = [
+        { p1: "mahal", p2: "tet", title: "הליכוד ⟷ הציונות הדתית וזהות" },
+        { p1: "po", p2: "ken", title: "יש עתיד ⟷ המחנה הממלכתי" },
+        { p1: "rak", p2: "derech", title: "ביחד (בנט) ⟷ ישר (איזנקוט)" },
+        { p1: "shas", p2: "gimel", title: "ש״ס ⟷ יהדות התורה" },
+        { p1: "lamed", p2: "day", title: "ישראל ביתנו ⟷ המילואימניקים" }
+      ];
 
-        const remainingSeats = TOTAL_SEATS - allocatedSeats;
-        for (let i = 0; i < remainingSeats; i++) {
-          let bestParty = null;
-          let highestQuotient = -1;
+      pairsList.forEach(pair => {
+        const p1Obj = PARTIES.find(p => p.id === pair.p1);
+        const p2Obj = PARTIES.find(p => p.id === pair.p2);
+        const bothQualify = (withS.seats[pair.p1] !== undefined) && (withS.seats[pair.p2] !== undefined);
 
-          qualifying.forEach(p => {
-            const quotient = p.votes / (p.seats + 1);
-            if (quotient > highestQuotient) {
-              highestQuotient = quotient;
-              bestParty = p;
-            }
-          });
+        // Calculate impact on pair
+        const seatsBefore = (withoutS.seats[pair.p1] || 0) + (withoutS.seats[pair.p2] || 0);
+        const seatsAfter = (withS.seats[pair.p1] || 0) + (withS.seats[pair.p2] || 0);
+        const netGain = seatsAfter - seatsBefore;
 
-          if (bestParty) bestParty.seats += 1;
+        let impactDesc = "ההסכם טרם הופעל (טרם נאספו מספיק קולות)";
+        if (bothQualify) {
+          if (netGain > 0) {
+            const p1Diff = (withS.seats[pair.p1] || 0) - (withoutS.seats[pair.p1] || 0);
+            const winner = p1Diff > 0 ? p1Obj.short : p2Obj.short;
+            impactDesc = `🎉 ההסכם העניק מנדט נוסף לטובת: <strong>${winner}</strong>!`;
+          } else {
+            impactDesc = "ההסכם פעיל אך לא שינה את חלוקת המנדטים מול רשימות אחרות.";
+          }
+        } else {
+          impactDesc = "⚠️ ההסכם אינו פעיל (אחת המפלגות לא עברה את אחוז החסימה).";
         }
-      }
 
-      const allResults = [...qualifying, ...nonQualifying].sort((a, b) => {
-        if (b.seats !== a.seats) return b.seats - a.seats;
-        return b.votes - a.votes;
+        const card = document.createElement("div");
+        card.className = "surplus-pair-card";
+        card.innerHTML = `
+          <div class="surplus-pair-header">
+            <span>${pair.title}</span>
+            <span class="surplus-pair-status ${bothQualify ? 'active' : 'inactive'}">
+              ${bothQualify ? '✓ הסכם פעיל' : 'לא פעיל'}
+            </span>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--text-muted);">
+            פתקים: [${p1Obj.letter}] ו-[${p2Obj.letter}] &bull; מנדטים משותפים: <strong>${seatsAfter}</strong>
+          </div>
+          <div class="surplus-impact-tag">${impactDesc}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderComparisonTable(votes, withS, withoutS, validVotes) {
+      const tbody = document.getElementById("comparison-table-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const sorted = PARTIES.filter(p => p.id !== "blank").sort((a, b) => {
+        const sA = withS.seats[a.id] || 0;
+        const sB = withS.seats[b.id] || 0;
+        if (sB !== sA) return sB - sA;
+        return (votes[b.id] || 0) - (votes[a.id] || 0);
       });
 
-      return {
-        totalBallots,
-        validVotes,
-        blankVotes,
-        thresholdVotes: Math.ceil(thresholdVotes),
-        qualifyingCount: qualifying.length,
-        results: allResults
-      };
+      sorted.forEach(p => {
+        const v = votes[p.id] || 0;
+        const pct = validVotes > 0 ? (v / validVotes * 100).toFixed(2) : "0.00";
+        const sBefore = withoutS.seats[p.id] || 0;
+        const sAfter = withS.seats[p.id] || 0;
+        const diff = sAfter - sBefore;
+
+        let diffBadge = `<span class="seat-diff-badge zero">ללא שינוי (0)</span>`;
+        if (diff > 0) diffBadge = `<span class="seat-diff-badge plus">+${diff} מנדט (הרוויחה מההסכם!)</span>`;
+        else if (diff < 0) diffBadge = `<span class="seat-diff-badge minus">${diff} מנדט (איבדה לרשימה בהסכם)</span>`;
+
+        const partner = p.surplus_partner ? PARTIES.find(x => x.id === p.surplus_partner) : null;
+        const partnerText = partner ? `${partner.short} (${partner.letter})` : "-";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${p.letter}</strong></td>
+          <td><strong>${p.short}</strong> <span style="font-size: 0.78rem; color: var(--text-muted);">${p.name}</span></td>
+          <td style="font-family: monospace;">${v.toLocaleString()}</td>
+          <td>${pct}%</td>
+          <td style="font-weight: 700; color: #64748b;">${sBefore}</td>
+          <td style="font-weight: 900; font-size: 1.15rem; color: var(--primary);">${sAfter}</td>
+          <td>${diffBadge}</td>
+          <td style="font-size: 0.82rem;">${partnerText}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    function refreshAdminResults() {
-      const data = calculateBaderOferResults();
-
-      document.getElementById("kpi-total-votes").textContent = data.totalBallots.toLocaleString();
-      document.getElementById("kpi-valid-votes").textContent = data.validVotes.toLocaleString();
-      document.getElementById("kpi-invalid-votes").textContent = data.blankVotes.toLocaleString();
-
-      const validRatio = data.totalBallots > 0 ? (data.validVotes / data.totalBallots * 100).toFixed(1) : "100";
-      const invalidRatio = data.totalBallots > 0 ? (data.blankVotes / data.totalBallots * 100).toFixed(1) : "0";
-      document.getElementById("kpi-valid-pct").textContent = validRatio + "% מסך הקולות";
-      document.getElementById("kpi-invalid-pct").textContent = invalidRatio + "% מסך הקולות";
-
-      document.getElementById("kpi-threshold-votes").textContent = data.thresholdVotes.toLocaleString();
-      document.getElementById("kpi-passed-parties").textContent = data.qualifyingCount;
-
+    function renderMainResultsTable(votes, withS, validVotes) {
       const tbody = document.getElementById("results-table-body");
-      if (tbody) {
-        tbody.innerHTML = "";
-        data.results.forEach(p => {
-          const tr = document.createElement("tr");
-          const isBlank = (p.id === "blank");
+      if (!tbody) return;
+      tbody.innerHTML = "";
 
-          const statusHtml = isBlank 
-            ? `<span class="status-tag failed">קול פסול / נמנע</span>`
-            : (p.passed 
-                ? `<span class="status-tag passed">✓ עברה (${p.pct.toFixed(2)}%)</span>` 
-                : `<span class="status-tag failed">לא עברה (${p.pct.toFixed(2)}%)</span>`);
+      const allSorted = PARTIES.map(p => ({
+        ...p,
+        v: votes[p.id] || 0,
+        pct: validVotes > 0 ? ((votes[p.id] || 0) / validVotes * 100) : 0,
+        seats: withS.seats[p.id] || 0,
+        passed: (withS.seats[p.id] !== undefined)
+      })).sort((a, b) => {
+        if (b.seats !== a.seats) return b.seats - a.seats;
+        return b.v - a.v;
+      });
 
-          const mandatePct = (p.seats / 120 * 100).toFixed(1);
-          const barWidth = Math.min(100, Math.max(2, p.pct * 3));
-
-          tr.innerHTML = `
-            <td><span class="mini-ballot-badge">${p.letter}</span></td>
-            <td>
-              <div style="font-weight: 800; color: var(--text);">${p.short}</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">${p.ballot_sub || p.name}</div>
-            </td>
-            <td style="font-weight: 800; font-family: monospace;">${p.votes.toLocaleString()}</td>
-            <td>${isBlank ? "-" : p.pct.toFixed(2) + "%"}</td>
-            <td>${statusHtml}</td>
-            <td><span style="font-size: 1.3rem; font-weight: 900; color: ${p.seats > 0 ? 'var(--primary)' : 'var(--text-muted)'};">${p.seats}</span></td>
-            <td>${p.seats > 0 ? mandatePct + "%" : "-"}</td>
-            <td>
-              <div style="width: 110px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                <div style="width: ${barWidth}%; height: 100%; background: ${p.color}; border-radius: 4px;"></div>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      drawKnessetArch(data.results.filter(p => p.seats > 0));
+      allSorted.forEach(p => {
+        const isBlank = p.id === "blank";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="font-weight: 900; font-size: 1.1rem; padding: 0.75rem 1rem;">${p.letter}</td>
+          <td style="padding: 0.75rem 1rem;"><strong>${p.short}</strong></td>
+          <td style="font-family: monospace; padding: 0.75rem 1rem;">${p.v.toLocaleString()}</td>
+          <td style="padding: 0.75rem 1rem;">${isBlank ? '-' : p.pct.toFixed(2) + '%'}</td>
+          <td style="padding: 0.75rem 1rem;">${isBlank ? 'פסול' : (p.passed ? '✓ עברה' : 'לא עברה')}</td>
+          <td style="font-weight: 900; font-size: 1.2rem; color: ${p.seats > 0 ? 'var(--primary)' : '#94a3b8'}; padding: 0.75rem 1rem;">${p.seats}</td>
+          <td style="font-size: 0.8rem; color: var(--text-muted); padding: 0.75rem 1rem;">${p.surplus_partner ? 'חתום' : '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    function drawKnessetArch(partiesWithSeats) {
+    function drawKnessetArch(seatList) {
       const canvas = document.getElementById("knesset-canvas");
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
@@ -1961,30 +2206,25 @@
         { count: 48, radius: 215 }
       ];
 
-      const seatColors = [];
-      partiesWithSeats.forEach(p => {
-        for (let i = 0; i < p.seats; i++) seatColors.push(p.color);
+      const colors = [];
+      seatList.forEach(p => {
+        for (let i = 0; i < p.seats; i++) colors.push(p.color);
       });
+      while (colors.length < 120) colors.push("#cbd5e1");
 
-      while (seatColors.length < 120) seatColors.push("#cbd5e1");
-
-      let currentSeatIndex = 0;
-      rows.forEach(row => {
-        const angleStep = Math.PI / (row.count + 1);
-        for (let j = 1; j <= row.count; j++) {
-          const angle = Math.PI - (j * angleStep);
-          const x = centerX + row.radius * Math.cos(angle);
-          const y = centerY - row.radius * Math.sin(angle);
-
-          const color = seatColors[currentSeatIndex] || "#cbd5e1";
-          currentSeatIndex++;
-
+      let idx = 0;
+      rows.forEach(r => {
+        const step = Math.PI / (r.count + 1);
+        for (let j = 1; j <= r.count; j++) {
+          const a = Math.PI - (j * step);
+          const x = centerX + r.radius * Math.cos(a);
+          const y = centerY - r.radius * Math.sin(a);
           ctx.beginPath();
           ctx.arc(x, y, 7, 0, 2 * Math.PI);
-          ctx.fillStyle = color;
+          ctx.fillStyle = colors[idx++] || "#cbd5e1";
           ctx.fill();
-          ctx.lineWidth = 1.5;
           ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         }
       });
@@ -1993,25 +2233,99 @@
       ctx.arc(centerX, centerY - 10, 24, Math.PI, 2 * Math.PI);
       ctx.fillStyle = "#0a192f";
       ctx.fill();
-
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 10px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("יו״ר", centerX, centerY - 14);
     }
 
-    // IP Management Tools
-    function generateRandomIP() {
-      const octet1 = [84, 147, 79, 109, 192, 10][Math.floor(Math.random() * 6)];
-      const octet2 = Math.floor(Math.random() * 254) + 1;
-      const octet3 = Math.floor(Math.random() * 254) + 1;
-      const octet4 = Math.floor(Math.random() * 254) + 1;
-      const newIP = `${octet1}.${octet2}.${octet3}.${octet4}`;
+    // ==============================================================
+    // APP INITIALIZATION & NAVIGATION
+    // ==============================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedIP = localStorage.getItem(STORAGE_KEY_CURRENT_IP);
+      currentIP = savedIP || ("192.168.1." + Math.floor(Math.random() * 150 + 20));
+      localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
 
-      currentIP = newIP;
+      ballotObjects = PARTIES.map(p => new BallotSlip(p));
+      window.ballotObjects = ballotObjects;
+
+      renderAllBallots();
+      updateIPStatusUI();
+      refreshAdminResults();
+      setupShareLinks();
+      generateQRCodeSVG();
+
+      if (window.location.protocol.startsWith('http')) {
+        fetch('/api/ip').then(r => r.json()).then(data => {
+          if (data && data.ip) {
+            currentIP = data.ip;
+            updateIPStatusUI();
+          }
+        }).catch(() => {});
+      }
+    });
+
+    function renderAllBallots() {
+      const grid = document.getElementById("ballots-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      const query = (document.getElementById("voter-search")?.value || "").trim().toLowerCase();
+
+      const filtered = ballotObjects.filter(b => {
+        if (categoryFilter === "knesset" && (b.id === "blank" || b.bloc === "other" || b.id === "rak" || b.id === "derech")) return false;
+        if (categoryFilter === "new" && (b.bloc !== "other" && b.id !== "rak" && b.id !== "derech")) return false;
+        if (categoryFilter === "blank" && b.id !== "blank") return false;
+
+        if (query) {
+          return b.letter.toLowerCase().includes(query) ||
+                 b.name.toLowerCase().includes(query) ||
+                 b.short.toLowerCase().includes(query) ||
+                 b.ballot_sub.toLowerCase().includes(query);
+        }
+        return true;
+      });
+
+      filtered.forEach(b => grid.appendChild(b.renderElement()));
+    }
+
+    function filterBallots() { renderAllBallots(); }
+    function setCategoryFilter(cat, btn) {
+      categoryFilter = cat;
+      document.querySelectorAll(".filter-pills .pill").forEach(p => p.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+      renderAllBallots();
+    }
+
+    function switchView(v) {
+      document.querySelectorAll(".view-section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("view-" + v)?.classList.add("active");
+      document.getElementById("tab-" + v)?.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (v === "admin") refreshAdminResults();
+    }
+
+    function updateIPStatusUI() {
+      const ipEl = document.getElementById("current-ip-display");
+      const pill = document.getElementById("ip-status-pill");
+      if (ipEl) ipEl.textContent = currentIP;
+      if (hasCurrentIPVoted()) {
+        if (pill) { pill.className = "voter-status-pill voted"; pill.innerHTML = "⛔ כבר הצבעת"; }
+      } else {
+        if (pill) { pill.className = "voter-status-pill can-vote"; pill.innerHTML = "✓ רשאי להצביע"; }
+      }
+      renderIPLogs();
+    }
+
+    // IP Testing Tools
+    function generateRandomIP() {
+      const oct1 = [84, 147, 79, 109, 192, 10][Math.floor(Math.random() * 6)];
+      currentIP = `${oct1}.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}`;
       localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
       updateIPStatusUI();
-      showToast(`כתובת ה-IP עודכנה ל: ${newIP}`, "success");
+      showToast(`IP הוחלף ל: ${currentIP}`);
     }
 
     function setManualIP() {
@@ -2020,7 +2334,7 @@
       currentIP = val;
       localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
       updateIPStatusUI();
-      showToast(`כתובת ה-IP הוחלפה ל: ${val}`, "success");
+      showToast(`IP עודכן ל: ${val}`);
     }
 
     function clearCurrentIPVote() {
@@ -2029,16 +2343,12 @@
         const pId = votedIPs[currentIP].partyId;
         delete votedIPs[currentIP];
         saveVotedIPs(votedIPs);
-
         const votes = getStoredVotes();
-        if (votes[pId] && votes[pId] > 0) {
-          votes[pId] -= 1;
-          saveVotes(votes);
-        }
-
+        if (votes[pId]) votes[pId] = Math.max(0, votes[pId] - 1);
+        saveVotes(votes);
         updateIPStatusUI();
         refreshAdminResults();
-        showToast("הצבעת כתובת IP זו בוטלה בהצלחה", "success");
+        showToast("הצבעת IP נוכחי נמחקה בהצלחה");
       }
     }
 
@@ -2046,59 +2356,48 @@
       const tbody = document.getElementById("ip-log-body");
       if (!tbody) return;
       tbody.innerHTML = "";
-
-      const votedIPs = getVotedIPs();
-      const entries = Object.entries(votedIPs);
-
+      const voted = getVotedIPs();
+      const entries = Object.entries(voted);
       if (entries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">אין עדיין הצבעות רשומות במערכת</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1rem;">אין הצבעות רשומות</td></tr>`;
         return;
       }
-
-      entries.forEach(([ip, record]) => {
+      entries.forEach(([ip, r]) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td style="font-family: monospace; font-weight: 700;">${ip}</td>
-          <td>${record.timestamp || "-"}</td>
-          <td><span class="mini-ballot-badge" style="font-size: 0.9rem; padding: 2px 6px;">${record.partyLetter || ""}</span> ${record.partyName || record.partyId}</td>
-          <td>
-            <button class="btn btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.78rem;" onclick="removeSingleIP('${ip}')">מחק הצבעה</button>
-          </td>
+          <td style="font-family: monospace; font-weight: 700; padding: 0.6rem;">${ip}</td>
+          <td style="padding: 0.6rem;">${r.timestamp}</td>
+          <td style="padding: 0.6rem;">[${r.partyLetter}] ${r.partyName}</td>
+          <td style="padding: 0.6rem;"><button class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="removeSingleIP('${ip}')">מחק</button></td>
         `;
         tbody.appendChild(tr);
       });
     }
 
     function removeSingleIP(ip) {
-      const votedIPs = getVotedIPs();
-      if (votedIPs[ip]) {
-        const pId = votedIPs[ip].partyId;
-        delete votedIPs[ip];
-        saveVotedIPs(votedIPs);
-
+      const voted = getVotedIPs();
+      if (voted[ip]) {
+        const pId = voted[ip].partyId;
+        delete voted[ip];
+        saveVotedIPs(voted);
         const votes = getStoredVotes();
-        if (votes[pId] && votes[pId] > 0) {
-          votes[pId] -= 1;
-          saveVotes(votes);
-        }
-
+        if (votes[pId]) votes[pId] = Math.max(0, votes[pId] - 1);
+        saveVotes(votes);
         updateIPStatusUI();
         refreshAdminResults();
       }
     }
 
     function seedSampleVotes() {
-      if (!confirm("להזריק 10,000 קולות דמה לסימולציית בחירות 2026?")) return;
-
-      const votes = {
-        "mahal": 2480, "rak": 1720, "po": 1350, "ken": 980, "tet": 760,
-        "bet": 810, "shas": 840, "gimel": 610, "lamed": 550, "emet": 430,
-        "am": 380, "vdm": 370, "derech": 190, "dalet": 120, "blank": 110
+      if (!confirm("להזריק 10,000 קולות דמה ריאליסטיים להמחשת חוק בדר-עופר והסכמי עודפים?")) return;
+      const sample = {
+        "mahal": 2550, "rak": 1780, "po": 1420, "ken": 980, "tet": 760,
+        "shas": 840, "bet": 810, "gimel": 610, "lamed": 550, "emet": 430,
+        "am": 380, "vdm": 370, "derech": 210, "day": 190, "dalet": 120, "blank": 110
       };
-
-      saveVotes(votes);
+      saveVotes(sample);
       refreshAdminResults();
-      showToast("10,000 קולות דמה הוזרקו בהצלחה!", "success");
+      showToast("10,000 קולות דמה הוזרקו בהצלחה!");
     }
 
     function confirmResetVotes() {
@@ -2107,104 +2406,81 @@
       localStorage.removeItem(STORAGE_KEY_IPS);
       updateIPStatusUI();
       refreshAdminResults();
-      showToast("נתוני הקלפי אופסו!", "info");
+      showToast("נתוני הקלפי אופסו!");
     }
 
     function exportResultsCSV() {
-      const data = calculateBaderOferResults();
-      let csv = "אותיות,שם הרשימה,מספר קולות,אחוז מהכשרים,עברה אחוז חסימה,מנדטים\n";
-
-      data.results.forEach(r => {
-        csv += `"${r.letter}","${r.name}",${r.votes},"${r.pct.toFixed(2)}%",${r.passed ? "כן" : "לא"},${r.seats}\n`;
+      const votes = getStoredVotes();
+      const withS = runBaderOferEngine(votes, true);
+      const withoutS = runBaderOferEngine(votes, false);
+      let csv = "אותיות,שם הרשימה,קולות,מנדטים בפועל (עם עודפים),מנדטים ללא עודפים,הסכם עודפים\n";
+      PARTIES.forEach(p => {
+        csv += `"${p.letter}","${p.name}",${votes[p.id] || 0},${withS.seats[p.id] || 0},${withoutS.seats[p.id] || 0},"${p.surplus_partner || 'אין'}"\n`;
       });
-
       const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", "election_2026_results.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "election_2026_surplus_results.csv";
+      a.click();
     }
 
-    // Share Modal Tools
+    // Share & QR
     function openShareModal() {
       document.getElementById("share-modal").classList.add("active");
       setupShareLinks();
     }
-
-    function closeShareModal() {
-      document.getElementById("share-modal").classList.remove("active");
-    }
+    function closeShareModal() { document.getElementById("share-modal").classList.remove("active"); }
 
     function setupShareLinks() {
-      const currentUrl = window.location.href.split("#")[0].split("?")[0];
-      const input = document.getElementById("share-link-input");
-      if (input) input.value = currentUrl;
-
-      const shareText = encodeURIComponent("הצבעתי עכשיו בבחירות 2026! בואו לבחור מתוך פתקי ההצבעה הרשמיים בישראל: " + currentUrl);
-      const waBtn = document.getElementById("share-whatsapp");
-      if (waBtn) waBtn.href = "https://api.whatsapp.com/send?text=" + shareText;
-
-      const tgBtn = document.getElementById("share-telegram");
-      if (tgBtn) tgBtn.href = "https://t.me/share/url?url=" + encodeURIComponent(currentUrl) + "&text=" + encodeURIComponent("בחירות 2026 לכנסת - בואו להצביע!");
-
-      const twBtn = document.getElementById("share-twitter");
-      if (twBtn) twBtn.href = "https://twitter.com/intent/tweet?text=" + shareText;
+      const url = window.location.href.split("#")[0].split("?")[0];
+      document.getElementById("share-link-input").value = url;
+      const text = encodeURIComponent("הצבעתי עכשיו בבחירות 2026! בואו לבחור מתוך פתקי ההצבעה הרשמיים בישראל: " + url);
+      document.getElementById("share-whatsapp").href = "https://api.whatsapp.com/send?text=" + text;
+      document.getElementById("share-telegram").href = "https://t.me/share/url?url=" + encodeURIComponent(url) + "&text=" + encodeURIComponent("בחירות 2026 לכנסת - בואו להצביע!");
+      document.getElementById("share-twitter").href = "https://twitter.com/intent/tweet?text=" + text;
     }
 
     function copyShareLink() {
-      const input = document.getElementById("share-link-input");
-      if (!input) return;
-      input.select();
+      const el = document.getElementById("share-link-input");
+      el.select();
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(input.value).then(() => showToast("הקישור הועתק ללוח!", "success"));
+        navigator.clipboard.writeText(el.value).then(() => showToast("הקישור הועתק ללוח!"));
       } else {
         document.execCommand("copy");
-        showToast("הקישור הועתק ללוח!", "success");
+        showToast("הקישור הועתק ללוח!");
       }
     }
 
     function generateQRCodeSVG() {
-      const container = document.getElementById("qr-code-box");
-      if (!container) return;
-      const size = 25, cellSize = 5;
+      const box = document.getElementById("qr-code-box");
+      if (!box) return;
+      const size = 25, cs = 5;
       let rects = "", seed = 4567;
       function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
-
       for (let r = 0; r < size; r++) {
         for (let c = 0; c < size; c++) {
-          const inTL = (r < 7 && c < 7);
-          const inTR = (r < 7 && c >= size - 7);
-          const inBL = (r >= size - 7 && c < 7);
-          let filled = false;
+          const inTL = (r < 7 && c < 7), inTR = (r < 7 && c >= size - 7), inBL = (r >= size - 7 && c < 7);
+          let f = false;
           if (inTL || inTR || inBL) {
-            const cr = inBL ? r - (size - 7) : r;
-            const cc = inTR ? c - (size - 7) : c;
-            filled = (cr === 0 || cr === 6 || cc === 0 || cc === 6 || (cr >= 2 && cr <= 4 && cc >= 2 && cc <= 4));
-          } else {
-            filled = rnd() > 0.55;
-          }
-          if (filled) {
-            rects += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="#0a192f" />`;
-          }
+            const cr = inBL ? r - (size - 7) : r, cc = inTR ? c - (size - 7) : c;
+            f = (cr === 0 || cr === 6 || cc === 0 || cc === 6 || (cr >= 2 && cr <= 4 && cc >= 2 && cc <= 4));
+          } else { f = rnd() > 0.55; }
+          if (f) rects += `<rect x="${c * cs}" y="${r * cs}" width="${cs}" height="${cs}" fill="#0a192f" />`;
         }
       }
-      const svgWidth = size * cellSize;
-      container.innerHTML = `<svg width="${svgWidth}" height="${svgWidth}" viewBox="0 0 ${svgWidth} ${svgWidth}"><rect width="100%" height="100%" fill="#ffffff"/>${rects}</svg>`;
+      const w = size * cs;
+      box.innerHTML = `<svg width="${w}" height="${w}" viewBox="0 0 ${w} ${w}"><rect width="100%" height="100%" fill="#ffffff"/>${rects}</svg>`;
     }
 
-    function showToast(msg, type = "success") {
-      const toast = document.getElementById("toast-notification");
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.style.background = (type === "error" ? "#dc2626" : (type === "info" ? "#0284c7" : "#0f172a"));
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3500);
+    function showToast(msg) {
+      const t = document.getElementById("toast-notification");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 3500);
     }
-  
-    // Expose all handlers to global window object
+
+    // Expose all functions to global window for inline click handlers
     window.switchView = switchView;
     window.openShareModal = openShareModal;
     window.closeShareModal = closeShareModal;
@@ -2218,7 +2494,9 @@
     window.setManualIP = setManualIP;
     window.clearCurrentIPVote = clearCurrentIPVote;
     window.removeSingleIP = removeSingleIP;
-
+    window.openPlatformModalById = openPlatformModalById;
+    window.closePlatformModal = closePlatformModal;
+    window.triggerVoteFromCard = triggerVoteFromCard;
   </script>
 </body>
 </html>
