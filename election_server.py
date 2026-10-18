@@ -519,6 +519,20 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json(PARTIES)
             return
 
+        if path == "/api/results":
+            data = load_data()
+            votes = data.get("votes", {})
+            voted_ips = data.get("voted_ips", {})
+            self.send_json({
+                "success": True,
+                "votes": votes,
+                "total_votes": sum(votes.values()),
+                "voted_count": len(voted_ips),
+                "voted_ips": voted_ips,
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+            })
+            return
+
         super().do_GET()
 
     def do_POST(self):
@@ -555,6 +569,52 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             data.setdefault("votes", {})[party_id] = data.get("votes", {}).get(party_id, 0) + 1
             save_data(data)
             self.send_json({"success": True, "ip": ip, "letter": valid["letter"], "party": valid["name"]})
+            return
+
+        
+        if path == "/api/admin/verify_pin":
+            pin = payload.get("pin", "")
+            is_valid = (pin in ["2026", "1234"])
+            self.send_json({"valid": is_valid})
+            return
+
+        if path == "/api/admin/reset":
+            pin = payload.get("pin", "")
+            if pin not in ["2026", "1234"]:
+                self.send_json({"error": "קוד גישה שגוי"}, 401)
+                return
+            data = {"voted_ips": {}, "votes": {p["id"]: 0 for p in PARTIES}}
+            save_data(data)
+            self.send_json({"success": True, "votes": data["votes"]})
+            return
+
+        if path == "/api/admin/inject":
+            pin = payload.get("pin", "")
+            if pin not in ["2026", "1234"]:
+                self.send_json({"error": "קוד גישה שגוי"}, 401)
+                return
+            data = load_data()
+            sample_weights = {
+                "mahal": 2600,
+                "rak": 2300,
+                "ken": 1300,
+                "lamed": 1100,
+                "shas": 1000,
+                "emet": 900,
+                "bet": 800,
+                "gimel": 800,
+                "tet": 500,
+                "vdm": 500,
+                "am": 500,
+                "derech": 400,
+                "kach": 400,
+                "day": 400,
+                "blank": 120,
+            }
+            for pid, cnt in sample_weights.items():
+                data.setdefault("votes", {})[pid] = data.get("votes", {}).get(pid, 0) + cnt
+            save_data(data)
+            self.send_json({"success": True, "votes": data["votes"]})
             return
 
         self.send_json({"error": "Not found"}, 404)

@@ -145,6 +145,66 @@
       box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
     }
 
+    
+    /* Live Sync Pulse Animation */
+    @keyframes syncPulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+      animation: syncPulse 1.8s infinite;
+    }
+
+    /* Keypad for PIN Modal */
+    .keypad-btn {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      padding: 0.6rem 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: #1e293b;
+      user-select: none;
+    }
+    .keypad-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    .keypad-btn:active {
+      background: #e2e8f0;
+      transform: scale(0.95);
+    }
+    .keypad-special {
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    .admin-locked-badge {
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      margin-right: 4px;
+    }
+    .admin-unlocked-badge {
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      margin-right: 4px;
+    }
+
     /* Status Bar */
     .status-bar {
       background: #ffffff;
@@ -895,16 +955,13 @@
       </div>
       <nav class="nav-tabs">
         <button class="tab-btn active" onclick="switchView('voter')" id="tab-voter">
-          <span>🗳️</span> קלפי לבוחר
+          <span>🗳️</span> מסך הבוחר (קלפי)
         </button>
-        <button class="tab-btn" onclick="switchView('admin')" id="tab-admin">
-          <span>📊</span> תוצאות ועודפים
+        <button class="tab-btn" onclick="handleAdminTabClick()" id="tab-admin">
+          <span id="tab-admin-icon">🔒</span> <span id="tab-admin-text">מסך ניהול ותוצאות</span>
         </button>
         <button class="tab-btn" onclick="openShareModal()" id="tab-share">
-          <span>🔗</span> שתף קישור
-        </button>
-        <button class="tab-btn" onclick="switchView('iptest')" id="tab-iptest">
-          <span>🧪</span> בדיקת IP
+          <span>🔗</span> שתף קלפי
         </button>
       </nav>
     </div>
@@ -1010,6 +1067,38 @@
 
     <!-- 3. ADMIN & SURPLUS RESULTS VIEW -->
     <section id="view-admin" class="view-section">
+    <!-- ADMIN REALTIME SYNC & CONTROL HEADER -->
+    <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 1.15rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border: 1px solid #334155; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div style="width: 44px; height: 44px; background: rgba(37,99,235,0.25); border: 1.5px solid #3b82f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+          📊
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <strong style="font-size: 1.15rem; color: #ffffff;">לוח מנהל הבחירות — תוצאות וסנכרון רשת</strong>
+            <span id="sync-live-badge" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; font-size: 0.75rem; padding: 3px 9px; border-radius: 999px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
+              <span class="pulse-dot"></span> מסונכרן בזמן אמת מול השרת
+            </span>
+          </div>
+          <div style="font-size: 0.83rem; color: #94a3b8; margin-top: 3px;">
+            סנכרון אחרון: <span id="sync-last-time" style="color: #f8fafc; font-weight: 700;">ממתין...</span> &bull; 
+            סך קולות שנרשמו בשרת: <strong id="admin-net-total-votes" style="color: #60a5fa; font-size: 0.95rem;">0</strong> &bull; 
+            כתובות IP שהצביעו: <strong id="admin-net-voters-count" style="color: #60a5fa; font-size: 0.95rem;">0</strong>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-outline" onclick="syncLiveResults(true)" style="background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.25); font-size: 0.85rem; padding: 0.5rem 0.9rem; font-weight: 700;">
+          🔄 רענן עכשיו
+        </button>
+        <button class="btn btn-outline" onclick="switchView('voter')" style="background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.25); font-size: 0.85rem; padding: 0.5rem 0.9rem;">
+          🗳️ חזרה לקלפי
+        </button>
+        <button class="btn" onclick="lockAdminSession()" style="background: #dc2626; color: #fff; border: none; font-size: 0.85rem; padding: 0.5rem 0.95rem; font-weight: 800; border-radius: 7px; cursor: pointer;">
+          🔒 נעל מסך (התנתק)
+        </button>
+      </div>
+    </div>
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
         <div>
           <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">לוח מנהל הבחירות: תוצאות, מנדטים ומפת הסכמי עודפים</h2>
@@ -1130,36 +1219,7 @@
     </section>
 
     <!-- 4. IP TEST & SIMULATOR VIEW -->
-    <section id="view-iptest" class="view-section">
-      <div style="background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">בדיקת הצבעה אחת ל-IP</h2>
-        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.25rem;">מאפשר לבחון חסימת הצבעה כפולה ולהחליף כתובות IP לבדיקת המערכת.</p>
-        
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-          <input type="text" id="manual-ip-input" placeholder="הקלד IP, למשל 10.0.0.99" style="padding: 0.65rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: monospace;">
-          <button class="btn btn-primary" onclick="setManualIP()">החלף IP</button>
-          <button class="btn btn-outline" onclick="generateRandomIP()">🎲 צור IP אקראי</button>
-          <button class="btn btn-outline" onclick="clearCurrentIPVote()">מחק הצבעה מ-IP זה</button>
-        </div>
-
-        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 0.75rem;">יומן כתובות IP שהצביעו:</h3>
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.88rem;">
-            <thead>
-              <tr style="background: #f8fafc; border-bottom: 2px solid var(--border);">
-                <th style="padding: 0.65rem 0.85rem;">כתובת IP</th>
-                <th style="padding: 0.65rem 0.85rem;">זמן הצבעה</th>
-                <th style="padding: 0.65rem 0.85rem;">מפלגה</th>
-                <th style="padding: 0.65rem 0.85rem;">פעולה</th>
-              </tr>
-            </thead>
-            <tbody id="ip-log-body">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+    
 
   </main>
 
@@ -1305,6 +1365,53 @@
       </div>
       <div style="padding: 1rem 1.5rem; background: #f8fafc; border-top: 1px solid var(--border); text-align: left;">
         <button class="btn btn-outline" onclick="closeShareModal()">סגור</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- ADMIN PIN ENTRY MODAL -->
+  <div class="modal-overlay" id="admin-pin-modal" onclick="closeAdminPinModal(event)">
+    <div class="modal-content" style="max-width: 420px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.35);" onclick="event.stopPropagation()">
+      <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🔐</span>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #f8fafc;">כניסת מנהל בחירות</h3>
+        </div>
+        <button class="btn" style="background: transparent; color: #94a3b8; font-size: 1.6rem; border: none; cursor: pointer; line-height: 1;" onclick="closeAdminPinModal()">&times;</button>
+      </div>
+      <div style="padding: 1.75rem 1.5rem 1.5rem 1.5rem; text-align: center; background: #ffffff;">
+        <p style="color: #475569; font-size: 0.92rem; margin-bottom: 1.25rem; line-height: 1.5;">
+          מסך התוצאות והניהול מוגן בקוד מורשה.<br>
+          <span style="display: inline-block; margin-top: 4px; color: #2563eb; font-weight: 700; background: #eff6ff; padding: 2px 10px; border-radius: 999px; border: 1px solid #bfdbfe;">קוד ברירת מחדל: 2026</span>
+        </p>
+
+        <div style="margin-bottom: 1.25rem;">
+          <input type="password" id="admin-pin-input" maxlength="6" placeholder="••••" 
+                 style="width: 100%; max-width: 220px; font-size: 2.2rem; letter-spacing: 0.6rem; text-align: center; padding: 0.4rem 0.5rem; border: 2.5px solid #cbd5e1; border-radius: 12px; outline: none; background: #f8fafc; font-family: monospace; transition: border-color 0.2s;"
+                 onkeydown="if(event.key==='Enter') submitAdminPin()">
+          <div id="admin-pin-error" style="color: #dc2626; font-size: 0.85rem; font-weight: 700; margin-top: 0.45rem; min-height: 1.3rem;"></div>
+        </div>
+
+        <!-- Touch keypad for mobile / tablet -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; max-width: 260px; margin: 0 auto 1.35rem auto;">
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('1')">1</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('2')">2</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('3')">3</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('4')">4</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('5')">5</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('6')">6</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('7')">7</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('8')">8</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('9')">9</button>
+          <button type="button" class="keypad-btn keypad-special" onclick="clearPinInput()">C</button>
+          <button type="button" class="keypad-btn" onclick="appendPinDigit('0')">0</button>
+          <button type="button" class="keypad-btn keypad-special" onclick="deletePinDigit()">⌫</button>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: center;">
+          <button class="btn btn-outline" onclick="closeAdminPinModal()" style="flex: 1; padding: 0.75rem; font-weight: 700;">ביטול</button>
+          <button class="btn btn-primary" onclick="submitAdminPin()" style="flex: 2; padding: 0.75rem; font-weight: 800; background: #2563eb;">כניסה למערכת ➔</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1867,6 +1974,7 @@
 
         this.playEnvelopeAnimation();
         await this.sendVoteToDatabase(votePayload);
+        setTimeout(() => syncLiveResults(false), 500);
       }
 
       playEnvelopeAnimation() {
@@ -2351,7 +2459,11 @@
     // ==============================================================
     // APP INITIALIZATION & NAVIGATION
     // ==============================================================
-    window.addEventListener("DOMContentLoaded", () => {
+        window.addEventListener("DOMContentLoaded", () => {
+      if (sessionStorage.getItem("admin_session_unlocked") === "true") {
+        unlockAdminUI(false);
+      }
+
       const savedIP = localStorage.getItem(STORAGE_KEY_CURRENT_IP);
       currentIP = savedIP || ("192.168.1." + Math.floor(Math.random() * 150 + 20));
       localStorage.setItem(STORAGE_KEY_CURRENT_IP, currentIP);
@@ -2408,12 +2520,26 @@
     }
 
     function switchView(v) {
+      if (v === "admin" && !isAdminUnlocked) {
+        openAdminPinModal();
+        return;
+      }
+
       document.querySelectorAll(".view-section").forEach(s => s.classList.remove("active"));
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("view-" + v)?.classList.add("active");
-      document.getElementById("tab-" + v)?.classList.add("active");
+
+      const sec = document.getElementById("view-" + v);
+      const tab = document.getElementById("tab-" + v);
+      if (sec) sec.classList.add("active");
+      if (tab) tab.classList.add("active");
+
       window.scrollTo({ top: 0, behavior: "smooth" });
-      if (v === "admin") refreshAdminResults();
+
+      if (v === "admin") {
+        startAdminPolling();
+      } else {
+        stopAdminPolling();
+      }
     }
 
     function updateIPStatusUI() {
@@ -2497,25 +2623,54 @@
       }
     }
 
-    function seedSampleVotes() {
-      if (!confirm("להזריק 10,000 קולות דמה ריאליסטיים להמחשת חוק בדר-עופר והסכמי עודפים?")) return;
+    async function seedSampleVotes() {
+      if (!confirm("להזריק 10,000 קולות דמה לשרת להמחשת חוק בדר-עופר והסכמי עודפים?")) return;
+      if (window.location.protocol.startsWith('http')) {
+        try {
+          const res = await fetch('/api/admin/inject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin: "2026" })
+          });
+          const data = await res.json();
+          if (data && data.success) {
+            saveVotes(data.votes);
+            syncLiveResults(false);
+            showToast("✓ 10,000 קולות דמה הוזרקו לשרת וסונכרנו לכל המכשירים!", "success");
+            return;
+          }
+        } catch (e) {}
+      }
       const sample = {
-        "mahal": 2550, "rak": 1780, "po": 1420, "ken": 980, "tet": 760,
-        "shas": 840, "bet": 810, "gimel": 610, "lamed": 550, "emet": 430,
-        "am": 380, "vdm": 370, "derech": 210, "day": 190, "dalet": 120, "blank": 110
+        "mahal": 2600, "rak": 2300, "ken": 1300, "lamed": 1100, "shas": 1000,
+        "emet": 900, "bet": 800, "gimel": 800, "tet": 500, "vdm": 500,
+        "am": 500, "derech": 400, "kach": 400, "day": 400, "blank": 120
       };
       saveVotes(sample);
       refreshAdminResults();
-      showToast("10,000 קולות דמה הוזרקו בהצלחה!");
+      showToast("✓ 10,000 קולות דמה הוזרקו מקומית בהצלחה!");
     }
 
-    function confirmResetVotes() {
-      if (!confirm("לאפס את כל נתוני הקלפי וה-IP?")) return;
+    async function confirmResetVotes() {
+      if (!confirm("האם לאפס את כל נתוני הקלפי וההצבעות מכל המכשירים בשרת?")) return;
+      if (window.location.protocol.startsWith('http')) {
+        try {
+          const res = await fetch('/api/admin/reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin: "2026" })
+          });
+          const data = await res.json();
+          if (data && data.success) {
+            saveVotes(data.votes);
+          }
+        } catch (e) {}
+      }
       localStorage.removeItem(STORAGE_KEY_VOTES);
       localStorage.removeItem(STORAGE_KEY_IPS);
       updateIPStatusUI();
-      refreshAdminResults();
-      showToast("נתוני הקלפי אופסו!");
+      syncLiveResults(false);
+      showToast("✓ כל נתוני הבחירות אופסו בהצלחה בכל המכשירים!", "info");
     }
 
     function exportResultsCSV() {
@@ -2650,6 +2805,209 @@
     window.openPlatformModalById = openPlatformModalById;
     window.closePlatformModal = closePlatformModal;
     window.triggerVoteFromCard = triggerVoteFromCard;
+
+    function toggleAdminIpTools() {
+      const el = document.getElementById("admin-ip-tools-content");
+      const icon = document.getElementById("admin-ip-toggle-icon");
+      if (!el) return;
+      if (el.style.display === "none") {
+        el.style.display = "block";
+        if (icon) icon.textContent = "▲";
+      } else {
+        el.style.display = "none";
+        if (icon) icon.textContent = "▼";
+      }
+    }
+    window.toggleAdminIpTools = toggleAdminIpTools;
+
+
+    // ==============================================================
+    // TWO SCREENS (VOTER VS MANAGEMENT) & PIN CODE SECURITY
+    // ==============================================================
+    let isAdminUnlocked = false;
+    let adminPollingInterval = null;
+
+    function handleAdminTabClick() {
+      if (isAdminUnlocked) {
+        switchView("admin");
+      } else {
+        openAdminPinModal();
+      }
+    }
+
+    function openAdminPinModal() {
+      const modal = document.getElementById("admin-pin-modal");
+      if (!modal) return;
+      const input = document.getElementById("admin-pin-input");
+      const err = document.getElementById("admin-pin-error");
+      if (input) input.value = "";
+      if (err) err.textContent = "";
+      modal.classList.add("active");
+      setTimeout(() => input && input.focus(), 150);
+    }
+
+    function closeAdminPinModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById("admin-pin-modal")?.classList.remove("active");
+    }
+
+    function appendPinDigit(d) {
+      const input = document.getElementById("admin-pin-input");
+      if (!input || input.value.length >= 6) return;
+      input.value += d;
+      const err = document.getElementById("admin-pin-error");
+      if (err) err.textContent = "";
+      if (input.value.length === 4 && (input.value === "2026" || input.value === "1234")) {
+        submitAdminPin();
+      }
+    }
+
+    function clearPinInput() {
+      const input = document.getElementById("admin-pin-input");
+      if (input) input.value = "";
+      const err = document.getElementById("admin-pin-error");
+      if (err) err.textContent = "";
+    }
+
+    function deletePinDigit() {
+      const input = document.getElementById("admin-pin-input");
+      if (input && input.value.length > 0) {
+        input.value = input.value.slice(0, -1);
+      }
+      const err = document.getElementById("admin-pin-error");
+      if (err) err.textContent = "";
+    }
+
+    async function submitAdminPin() {
+      const input = document.getElementById("admin-pin-input");
+      const err = document.getElementById("admin-pin-error");
+      const val = (input?.value || "").trim();
+
+      let isValid = (val === "2026" || val === "1234");
+      if (!isValid && window.location.protocol.startsWith('http')) {
+        try {
+          const r = await fetch('/api/admin/verify_pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin: val })
+          });
+          const data = await r.json();
+          if (data && data.valid) isValid = true;
+        } catch (e) {}
+      }
+
+      if (isValid) {
+        unlockAdminUI(true);
+        closeAdminPinModal();
+        switchView("admin");
+        showToast("🔓 כניסה אושרה — לוח הניהול והתוצאות פתוח ומסונכרן", "success");
+      } else {
+        if (err) err.textContent = "❌ קוד גישה שגוי. נסה שוב (קוד ברירת מחדל: 2026)";
+        if (input) {
+          input.style.borderColor = "#ef4444";
+          setTimeout(() => input.style.borderColor = "#cbd5e1", 1200);
+        }
+      }
+    }
+
+    function unlockAdminUI(showFeedback = true) {
+      isAdminUnlocked = true;
+      sessionStorage.setItem("admin_session_unlocked", "true");
+      const icon = document.getElementById("tab-admin-icon");
+      const txt = document.getElementById("tab-admin-text");
+      if (icon) icon.textContent = "📊";
+      if (txt) txt.textContent = "ניהול ותוצאות (מחובר)";
+    }
+
+    function lockAdminSession() {
+      isAdminUnlocked = false;
+      sessionStorage.removeItem("admin_session_unlocked");
+      const icon = document.getElementById("tab-admin-icon");
+      const txt = document.getElementById("tab-admin-text");
+      if (icon) icon.textContent = "🔒";
+      if (txt) txt.textContent = "מסך ניהול ותוצאות";
+      stopAdminPolling();
+      switchView("voter");
+      showToast("🔒 מסך הניהול ננעל בהצלחה", "info");
+    }
+
+    // ==============================================================
+    // REALTIME CROSS-DEVICE LIVE SYNCHRONIZATION
+    // ==============================================================
+    async function syncLiveResults(manual = false) {
+      let votes = getStoredVotes();
+      let serverSynced = false;
+
+      if (window.location.protocol.startsWith('http')) {
+        try {
+          const res = await fetch('/api/results');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.votes) {
+              votes = data.votes;
+              saveVotes(votes);
+              serverSynced = true;
+
+              if (data.voted_ips) {
+                saveVotedIPs(data.voted_ips);
+              }
+
+              const totVotesEl = document.getElementById("admin-net-total-votes");
+              const totVotersEl = document.getElementById("admin-net-voters-count");
+              const lastTimeEl = document.getElementById("sync-last-time");
+              const liveBadge = document.getElementById("sync-live-badge");
+
+              if (totVotesEl) totVotesEl.textContent = (data.total_votes || 0).toLocaleString();
+              if (totVotersEl) totVotersEl.textContent = (data.voted_count || 0).toLocaleString();
+              if (lastTimeEl) lastTimeEl.textContent = data.timestamp || new Date().toLocaleTimeString("he-IL");
+              if (liveBadge) {
+                liveBadge.style.display = "inline-flex";
+                liveBadge.innerHTML = `<span class="pulse-dot"></span> מסונכרן בזמן אמת מול השרת`;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("Server sync check:", e);
+        }
+      }
+
+      if (!serverSynced) {
+        const lastTimeEl = document.getElementById("sync-last-time");
+        if (lastTimeEl) lastTimeEl.textContent = new Date().toLocaleTimeString("he-IL") + " (מקומי)";
+      }
+
+      refreshAdminResults(votes);
+
+      if (manual) {
+        showToast(serverSynced ? "✓ התוצאות סונכרנו בהצלחה מול שרת הבחירות!" : "✓ תוצאות מקומיות עודכנו", "success");
+      }
+    }
+
+    function startAdminPolling() {
+      stopAdminPolling();
+      syncLiveResults(false);
+      adminPollingInterval = setInterval(() => {
+        syncLiveResults(false);
+      }, 3000);
+    }
+
+    function stopAdminPolling() {
+      if (adminPollingInterval) {
+        clearInterval(adminPollingInterval);
+        adminPollingInterval = null;
+      }
+    }
+
+    window.handleAdminTabClick = handleAdminTabClick;
+    window.openAdminPinModal = openAdminPinModal;
+    window.closeAdminPinModal = closeAdminPinModal;
+    window.appendPinDigit = appendPinDigit;
+    window.clearPinInput = clearPinInput;
+    window.deletePinDigit = deletePinDigit;
+    window.submitAdminPin = submitAdminPin;
+    window.lockAdminSession = lockAdminSession;
+    window.syncLiveResults = syncLiveResults;
+
   </script>
 </body>
 </html>
