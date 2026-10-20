@@ -1,3 +1,8 @@
+
+
+index.html
+
+100%
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -956,7 +961,7 @@
         <div class="title-group">
           <h1>
             בחירות 2026 לכנסת ה-26 | קלפי אינטרנטית
-            <span class="election-date-badge">27 באוקטובר 2026</span>
+            <span class="election-date-badge">27 באוקטובר 2026</span> <span style="background: #16a34a; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; margin-right: 6px; display: inline-flex; align-items: center; gap: 4px;">⚡ גרסה 4.2 מעודכנת</span>
           </h1>
           <p>פתקי הצבעה רשמיים, שקפי מצע בריחוף, מפת הסכמי עודפים וחישוב מנדטים</p>
         </div>
@@ -1068,6 +1073,7 @@
 
         <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
           <button class="btn btn-primary" onclick="openShareModal()"><span>🔗</span> שתף את אתר הבחירות</button>
+          <button class="btn btn-outline" onclick="allowVoteAgain()" style="border-color: #2563eb; color: #2563eb; font-weight: 800; background: #eff6ff;"><span>🔄</span> אפס והצבע מחדש במכשיר זה</button>
           <button class="btn btn-outline" onclick="handleAdminTabClick()"><span>🔒</span> כניסת מנהל לתוצאות האמת</button>
         </div>
       </div>
@@ -1938,8 +1944,24 @@
     }
 
     function hasCurrentDeviceVoted() {
+      const votes = getStoredVotes();
+      const total = Object.values(votes).reduce((a, b) => a + b, 0);
+      if (total === 0) {
+        localStorage.removeItem("il_election_has_voted");
+        return false;
+      }
       return localStorage.getItem("il_election_has_voted") === "true";
     }
+
+    function allowVoteAgain() {
+      localStorage.removeItem("il_election_has_voted");
+      const newDevId = "dev_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now();
+      localStorage.setItem("il_election_device_id", newDevId);
+      updateIPStatusUI();
+      switchView("voter");
+      showToast("✓ מכשיר זה אופס בהצלחה - הנך רשאי/ת להצביע מחדש בקלפי!", "success");
+    }
+    window.allowVoteAgain = allowVoteAgain;
 
     class BallotSlip {
       constructor(data) {
@@ -2559,7 +2581,11 @@
       updateIPStatusUI();
       setupShareLinks();
       generateQRCodeSVG();
+      console.log("%c🗳️ מערכת הבחירות 2026 - גרסה 4.2 מעודכנת (2 מסכים + איפוס רב-מכשירי)", "background: #1877f2; color: #fff; font-size: 14px; padding: 6px; border-radius: 4px;");
       syncLiveResults(false); // Immediately fetch global live results from server on page load!
+      if (window.location.protocol.startsWith("http")) {
+        setInterval(() => syncLiveResults(false), 3000); // Continuous live sync & reset listener
+      }
 
       if (window.location.protocol.startsWith('http')) {
         fetch('/api/ip').then(r => r.json()).then(data => {
@@ -2752,6 +2778,9 @@
       }
       localStorage.removeItem(STORAGE_KEY_VOTES);
       localStorage.removeItem(STORAGE_KEY_IPS);
+      localStorage.removeItem("il_election_has_voted");
+      const newDevId = "dev_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now();
+      localStorage.setItem("il_election_device_id", newDevId);
       updateIPStatusUI();
       syncLiveResults(false);
       showToast("✓ כל נתוני הבחירות אופסו בהצלחה בכל המכשירים!", "info");
@@ -3049,6 +3078,29 @@
               saveVotes(votes);
               serverSynced = true;
 
+              // Automatic detection of server reset across all phones and PCs!
+              const localResetId = localStorage.getItem("il_election_reset_id");
+              const serverResetId = data.reset_id ? String(data.reset_id) : null;
+              const totalVotes = data.total_votes || 0;
+
+              if ((serverResetId && localResetId && serverResetId !== localResetId) || totalVotes === 0) {
+                if (localStorage.getItem("il_election_has_voted") === "true") {
+                  localStorage.removeItem("il_election_has_voted");
+                  const newDevId = "dev_" + Math.random().toString(36).substring(2, 10) + "_" + Date.now();
+                  localStorage.setItem("il_election_device_id", newDevId);
+                  updateIPStatusUI();
+                  if (document.getElementById("view-success")?.classList.contains("active")) {
+                    switchView("voter");
+                    showToast("🔔 מנהל הבחירות איפס את נתוני הקלפי - הנך רשאי/ת להצביע מחדש!", "info");
+                  }
+                }
+                if (serverResetId) {
+                  localStorage.setItem("il_election_reset_id", serverResetId);
+                }
+              } else if (serverResetId && !localResetId) {
+                localStorage.setItem("il_election_reset_id", serverResetId);
+              }
+
               if (data.voted_ips) {
                 saveVotedIPs(data.voted_ips);
               }
@@ -3175,3 +3227,4 @@
   </script>
 </body>
 </html>
+המערכת מציגה את index.html.
