@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-שרת בחירות 2026 לכנסת ה-26 (גרסה 3.0)
-שרת HTTP ו-REST API מובנה ב-Python.
-תומך באכיפת הצבעה אחת ל-IP, שקפי מצע, רשימת מועמדים רשמית ומפת הסכמי עודפים.
+שרת בחירות 2026 לכנסת ה-26 (גרסה 4.0 - Multi-Device Concurrency & Live Sync)
+שרת HTTP ו-REST API מבוסס ThreadingTCPServer עם סנכרון רשת מלא.
+תומך בהצבעה סימולטנית ממאות מכשירים במקביל (טלפונים, טאבלטים ומחשבים) לאותן תוצאות אמת.
 """
 
 import http.server
@@ -11,11 +11,15 @@ import urllib.parse
 import json
 import os
 import sys
+import threading
 from datetime import datetime
 
 PORT = 8000
 DATA_FILE = "elections_data.json"
 HTML_FILE = "israel_elections_app.html"
+
+# מנעול לסנכרון כתיבה בטוחה לקובץ הנתונים בריבוי נימים (Thread-Safety)
+db_lock = threading.Lock()
 
 PARTIES = [
   {
@@ -452,20 +456,38 @@ PARTIES = [
 
 def load_data():
     if not os.path.exists(DATA_FILE):
-        initial = {"voted_ips": {}, "votes": {p["id"]: 0 for p in PARTIES}}
+        initial = {
+            "voted_devices": {},
+            "voted_ips": {},
+            "votes": {p["id"]: 0 for p in PARTIES}
+        }
         save_data(initial)
         return initial
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            data.setdefault("voted_devices", {})
+            data.setdefault("voted_ips", {})
+            data.setdefault("votes", {p["id"]: 0 for p in PARTIES})
+            for p in PARTIES:
+                data["votes"].setdefault(p["id"], 0)
+            return data
     except Exception:
-        initial = {"voted_ips": {}, "votes": {p["id"]: 0 for p in PARTIES}}
+        initial = {
+            "voted_devices": {},
+            "voted_ips": {},
+            "votes": {p["id"]: 0 for p in PARTIES}
+        }
         save_data(initial)
         return initial
 
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+class ThreadingElectionServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    daemon_threads = True
+    allow_reuse_address = True
 
 class ElectionHandler(http.server.SimpleHTTPRequestHandler):
     def get_client_ip(self):
@@ -480,8 +502,9 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Voter-Device-Id")
         self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.end_headers()
         self.wfile.write(body)
 
@@ -489,7 +512,7 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Voter-Device-Id")
         self.end_headers()
 
     def do_GET(self):
@@ -504,14 +527,16 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(content)))
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
                 self.end_headers()
                 self.wfile.write(content)
                 return
 
         if path == "/api/ip":
             ip = self.get_client_ip()
-            data = load_data()
-            voted = ip in data.get("voted_ips", {})
+            with db_lock:
+                data = load_data()
+                voted = ip in data.get("voted_ips", {})
             self.send_json({"ip": ip, "has_voted": voted})
             return
 
@@ -520,17 +545,20 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         if path == "/api/results":
-            data = load_data()
-            votes = data.get("votes", {})
-            voted_ips = data.get("voted_ips", {})
-            self.send_json({
-                "success": True,
-                "votes": votes,
-                "total_votes": sum(votes.values()),
-                "voted_count": len(voted_ips),
-                "voted_ips": voted_ips,
-                "timestamp": datetime.now().strftime("%H:%M:%S"),
-            })
+            with db_lock:
+                data = load_data()
+                votes = data.get("votes", {})
+                voted_devices = data.get("voted_devices", {})
+                total_votes = sum(votes.values())
+                voted_cnt = len(voted_devices)
+                res = {
+                    "success": True,
+                    "votes": votes,
+                    "total_votes": total_votes,
+                    "voted_count": voted_cnt,
+                    "timestamp": datetime.now().strftime("%H:%M:%S")
+                }
+            self.send_json(res)
             return
 
         super().do_GET()
@@ -547,8 +575,10 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             payload = {}
 
         if path == "/api/vote":
-            ip = self.get_client_ip()
+            client_ip = self.get_client_ip()
             party_id = payload.get("party_id")
+            device_id = payload.get("voter_device_id") or self.headers.get("X-Voter-Device-Id") or client_ip
+
             if not party_id:
                 self.send_json({"error": "נא לספק מזהה מפלגה"}, 400)
                 return
@@ -558,42 +588,78 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({"error": "מפלגה לא חוקית"}, 400)
                 return
 
-            data = load_data()
-            voted = data.setdefault("voted_ips", {})
-            if ip in voted:
-                self.send_json({"error": f"כתובת ה-IP ({ip}) כבר הצביעה.", "already_voted": True}, 403)
-                return
+            with db_lock:
+                data = load_data()
+                voted_devs = data.setdefault("voted_devices", {})
+                voted_ips = data.setdefault("voted_ips", {})
 
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            voted[ip] = {"party_id": party_id, "party_letter": valid["letter"], "party_name": valid["name"], "timestamp": now}
-            data.setdefault("votes", {})[party_id] = data.get("votes", {}).get(party_id, 0) + 1
-            save_data(data)
-            self.send_json({"success": True, "ip": ip, "letter": valid["letter"], "party": valid["name"]})
+                # אכיפת הצבעה אחת למכשיר (מאפשר למאות מכשירים שונים ברשת/Wi-Fi להצביע במקביל!)
+                if device_id in voted_devs:
+                    self.send_json({
+                        "error": "מכשיר זה כבר ביצע הצבעה במערכת זו.",
+                        "already_voted": True,
+                        "votes": data["votes"],
+                        "total_votes": sum(data["votes"].values()),
+                        "voted_count": len(voted_devs)
+                    }, 403)
+                    return
+
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                voted_devs[device_id] = {
+                    "party_id": party_id,
+                    "party_letter": valid["letter"],
+                    "party_name": valid["name"],
+                    "ip": client_ip,
+                    "timestamp": now
+                }
+                voted_ips[client_ip] = {
+                    "party_id": party_id,
+                    "timestamp": now
+                }
+                data.setdefault("votes", {})[party_id] = data.get("votes", {}).get(party_id, 0) + 1
+                save_data(data)
+
+                total_v = sum(data["votes"].values())
+                voted_cnt = len(voted_devs)
+                updated_votes = dict(data["votes"])
+
+            self.send_json({
+                "success": True,
+                "votes": updated_votes,
+                "total_votes": total_v,
+                "voted_count": voted_cnt,
+                "party": valid["name"],
+                "letter": valid["letter"]
+            })
             return
 
-        
         if path == "/api/admin/verify_pin":
-            pin = payload.get("pin", "")
+            pin = str(payload.get("pin", "")).strip()
             is_valid = (pin in ["2026", "1234"])
             self.send_json({"valid": is_valid})
             return
 
         if path == "/api/admin/reset":
-            pin = payload.get("pin", "")
+            pin = str(payload.get("pin", "")).strip()
             if pin not in ["2026", "1234"]:
                 self.send_json({"error": "קוד גישה שגוי"}, 401)
                 return
-            data = {"voted_ips": {}, "votes": {p["id"]: 0 for p in PARTIES}}
-            save_data(data)
-            self.send_json({"success": True, "votes": data["votes"]})
+            with db_lock:
+                data = {
+                    "voted_devices": {},
+                    "voted_ips": {},
+                    "votes": {p["id"]: 0 for p in PARTIES}
+                }
+                save_data(data)
+                res_votes = dict(data["votes"])
+            self.send_json({"success": True, "votes": res_votes, "total_votes": 0, "voted_count": 0})
             return
 
         if path == "/api/admin/inject":
-            pin = payload.get("pin", "")
+            pin = str(payload.get("pin", "")).strip()
             if pin not in ["2026", "1234"]:
                 self.send_json({"error": "קוד גישה שגוי"}, 401)
                 return
-            data = load_data()
             sample_weights = {
                 "mahal": 2600,
                 "rak": 2300,
@@ -611,10 +677,15 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 "day": 400,
                 "blank": 120,
             }
-            for pid, cnt in sample_weights.items():
-                data.setdefault("votes", {})[pid] = data.get("votes", {}).get(pid, 0) + cnt
-            save_data(data)
-            self.send_json({"success": True, "votes": data["votes"]})
+            with db_lock:
+                data = load_data()
+                for pid, cnt in sample_weights.items():
+                    data.setdefault("votes", {})[pid] = data.get("votes", {}).get(pid, 0) + cnt
+                save_data(data)
+                res_votes = dict(data["votes"])
+                tot_v = sum(res_votes.values())
+                cnt_dev = len(data.get("voted_devices", {})) + 10000
+            self.send_json({"success": True, "votes": res_votes, "total_votes": tot_v, "voted_count": cnt_dev})
             return
 
         self.send_json({"error": "Not found"}, 404)
@@ -622,6 +693,15 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     load_data()
     port = int(sys.argv[1]) if len(sys.argv) > 1 else PORT
-    print(f"Server listening on http://localhost:{port}")
-    with socketserver.TCPServer(("", port), ElectionHandler) as httpd:
-        httpd.serve_forever()
+    try:
+        with ThreadingElectionServer(("", port), ElectionHandler) as httpd:
+            print(f"\n✓ שרת הבחירות (גרסה 4.0 רב-מכשיר סימולטני) פועל בכתובת: http://localhost:{port}")
+            print(f"לתמיכה בריבוי מכשירים וסנכרון חי, השרת מאפשר למאות מכשירים להצביע במקביל.")
+            print(f"לעצירת השרת: Ctrl + C\n")
+            httpd.serve_forever()
+    except OSError as e:
+        if e.errno == 98:
+            print(f"\n⚠️ פורט {port} כבר תפוס על ידי שרת שרץ ברקע!")
+            print(f"👉 לשחרור הפורט הרץ:  fuser -k {port}/tcp  או  pkill -f election_server.py")
+            print(f"👉 או הרץ על פורט אחר:  python3 election_server.py {port+1}\n")
+        sys.exit(1)

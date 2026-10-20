@@ -388,14 +388,14 @@
     .ballot-slip-card {
       background: var(--ballot-paper);
       border: 2px solid var(--ballot-border);
-      border-radius: 4px;
-      padding: 1.25rem 0.9rem 0.85rem;
+      border-radius: 6px;
+      padding: 0.65rem 0.75rem 0.75rem;
       box-shadow: var(--shadow-ballot);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      min-height: 270px;
+      min-height: 290px;
       cursor: pointer;
       position: relative;
       transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
@@ -410,16 +410,19 @@
       border-color: var(--accent);
     }
 
+    /* Fixed Top Bar: In-flow (NOT absolute) with clear separation so controls NEVER overlap letters */
     .ballot-top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: absolute;
-      top: 6px;
-      left: 0;
-      right: 0;
-      padding: 0 8px;
+      position: relative;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+      gap: 4px;
+      flex-wrap: wrap;
+      z-index: 2;
     }
 
     .ballot-official-tag {
@@ -449,13 +452,18 @@
     .platform-info-btn:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
 
     .ballot-letter-huge {
-      font-size: 3.6rem;
+      font-size: 3.3rem;
       font-weight: 900;
       color: #000000;
-      line-height: 1;
-      margin: 1.1rem 0 0.5rem;
+      line-height: 1.1;
+      margin: 0.35rem 0 0.55rem;
       text-align: center;
       letter-spacing: -0.04em;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
     }
 
     .ballot-official-name {
@@ -928,9 +936,9 @@
     @media (max-width: 768px) {
       header { padding: 0.75rem 1rem; }
       .header-container { flex-direction: column; align-items: stretch; }
-      .ballots-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
-      .ballot-slip-card { min-height: 230px; padding: 1rem 0.6rem 0.6rem; }
-      .ballot-letter-huge { font-size: 2.8rem; margin: 0.8rem 0 0.3rem; }
+      .ballots-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.85rem; }
+      .ballot-slip-card { min-height: 275px; padding: 0.6rem 0.65rem 0.7rem; }
+      .ballot-letter-huge { font-size: 2.7rem; margin: 0.25rem 0 0.4rem; }
       .ballot-official-name { font-size: 0.78rem; }
       .kpi-grid { grid-template-columns: 1fr 1fr; }
       .platform-pillars-grid { grid-template-columns: 1fr; }
@@ -1060,13 +1068,55 @@
 
         <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
           <button class="btn btn-primary" onclick="openShareModal()"><span>🔗</span> שתף את אתר הבחירות</button>
-          <button class="btn btn-outline" onclick="switchView('admin')"><span>📊</span> צפה בתוצאות האמת ומפת העודפים</button>
+          <button class="btn btn-outline" onclick="handleAdminTabClick()"><span>🔒</span> כניסת מנהל לתוצאות האמת</button>
         </div>
       </div>
     </section>
 
     <!-- 3. ADMIN & SURPLUS RESULTS VIEW -->
     <section id="view-admin" class="view-section">
+
+    <!-- IN-PAGE LOCK SCREEN (SHOWN WHEN LOCKED) -->
+    <div id="admin-lock-screen" style="max-width: 480px; margin: 3rem auto; background: #ffffff; border-radius: 16px; padding: 2.25rem 2rem; box-shadow: 0 10px 35px rgba(0,0,0,0.12); border: 1.5px solid #e2e8f0; text-align: center;">
+      <div style="width: 64px; height: 64px; background: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem auto; border: 2px solid #bfdbfe;">
+        🔒
+      </div>
+      <h3 style="font-size: 1.35rem; color: #0f172a; margin-bottom: 0.5rem; font-weight: 800;">מסך ניהול ותוצאות מוגן</h3>
+      <p style="color: #64748b; font-size: 0.92rem; margin-bottom: 1.35rem; line-height: 1.5;">
+        הגישה ללוח מנהל הבחירות ולתוצאות בזמן אמת מוגנת בקוד גישה מורשה.<br>
+        <span style="display: inline-block; margin-top: 5px; color: #2563eb; font-weight: 800; background: #eff6ff; padding: 3px 12px; border-radius: 999px; border: 1px solid #bfdbfe;">קוד גישה: 2026</span>
+      </p>
+
+      <div style="margin-bottom: 1.25rem;">
+        <input type="password" id="inpage-admin-pin-input" maxlength="6" placeholder="••••"
+               style="width: 100%; max-width: 230px; font-size: 2.2rem; letter-spacing: 0.6rem; text-align: center; padding: 0.45rem; border: 2.5px solid #cbd5e1; border-radius: 12px; outline: none; background: #f8fafc; font-family: monospace;"
+               onkeydown="if(event.key==='Enter') submitInpageAdminPin()">
+        <div id="inpage-admin-pin-error" style="color: #dc2626; font-size: 0.85rem; font-weight: 700; margin-top: 0.45rem; min-height: 1.3rem;"></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 260px; margin: 0 auto 1.35rem auto;">
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('1')">1</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('2')">2</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('3')">3</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('4')">4</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('5')">5</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('6')">6</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('7')">7</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('8')">8</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('9')">9</button>
+        <button type="button" class="keypad-btn keypad-special" onclick="clearInpagePin()">C</button>
+        <button type="button" class="keypad-btn" onclick="appendInpagePin('0')">0</button>
+        <button type="button" class="keypad-btn keypad-special" onclick="deleteInpagePin()">⌫</button>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button class="btn btn-outline" onclick="switchView('voter')" style="flex: 1; padding: 0.75rem; font-weight: 700;">חזרה לקלפי</button>
+        <button class="btn btn-primary" onclick="submitInpageAdminPin()" style="flex: 2; padding: 0.75rem; font-weight: 800; background: #2563eb;">כניסה למערכת ➔</button>
+      </div>
+    </div>
+
+    <!-- ACTUAL ADMIN CONTENT (HIDDEN UNTIL UNLOCKED) -->
+    <div id="admin-unlocked-content" style="display: none;">
     <!-- ADMIN REALTIME SYNC & CONTROL HEADER -->
     <div style="background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 1.15rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border: 1px solid #334155; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
       <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
@@ -1257,6 +1307,9 @@
       <span>🤝</span> <span id="fp-surplus-text">הסכם עודפים</span>
     </div>
   </div>
+
+  </div>
+  </section>
 
   <!-- PLATFORM MODAL (Mobile & Tablet Click) -->
   <div class="platform-modal-overlay" id="platform-modal" onclick="closePlatformModal(event)">
@@ -1873,6 +1926,21 @@
     // ==============================================================
     // BALLOT SLIP COMPONENT CLASS WITH PLATFORM POPUP & SURPLUS
     // ==============================================================
+
+    // Device ID for multi-device simultaneous voting across hundreds of phones & computers
+    function getOrCreateDeviceId() {
+      let devId = localStorage.getItem("il_election_device_id");
+      if (!devId) {
+        devId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now();
+        localStorage.setItem("il_election_device_id", devId);
+      }
+      return devId;
+    }
+
+    function hasCurrentDeviceVoted() {
+      return localStorage.getItem("il_election_has_voted") === "true";
+    }
+
     class BallotSlip {
       constructor(data) {
         this.id = data.id;
@@ -1937,9 +2005,7 @@
 
         card.innerHTML = `
           <div class="ballot-top-bar">
-            <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-              <span class="ballot-official-tag">${catBadge}</span>
-            </div>
+            <span class="ballot-official-tag">${catBadge}</span>
             <div style="display: flex; gap: 4px; align-items: center;">
               <button class="platform-info-btn" style="background: #f0fdf4; border-color: #86efac; color: #166534;" onclick="openCandidatesModalById('${this.id}', event)">👥 מועמדים</button>
               <button class="platform-info-btn" onclick="openPlatformModalById('${this.id}', event)">👁️ מצע</button>
@@ -1958,13 +2024,15 @@
       }
 
       async submitVote() {
-        if (hasCurrentIPVoted()) {
-          showToast("⛔ לא ניתן להצביע שנית: כתובת ה-IP שלך כבר הצביעה במערכת זו!", "error");
+        if (hasCurrentDeviceVoted()) {
+          showToast("⛔ מכשיר זה כבר ביצע הצבעה במערכת הבחירות!", "error");
           return;
         }
 
+        const devId = getOrCreateDeviceId();
         const votePayload = {
           party_id: this.id,
+          voter_device_id: devId,
           letter: this.letter,
           name: this.name,
           short: this.short,
@@ -1974,7 +2042,6 @@
 
         this.playEnvelopeAnimation();
         await this.sendVoteToDatabase(votePayload);
-        setTimeout(() => syncLiveResults(false), 500);
       }
 
       playEnvelopeAnimation() {
@@ -2010,19 +2077,36 @@
       }
 
       async sendVoteToDatabase(payload) {
+        let serverSynced = false;
         if (window.location.protocol.startsWith('http')) {
           try {
-            await fetch('/api/vote', {
+            const res = await fetch('/api/vote', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ party_id: this.id })
+              headers: { 
+                'Content-Type': 'application/json',
+                'X-Voter-Device-Id': payload.voter_device_id || getOrCreateDeviceId()
+              },
+              body: JSON.stringify(payload)
             });
-          } catch (e) {}
+            const data = await res.json();
+            if (data && data.votes) {
+              saveVotes(data.votes); // Save shared server votes!
+              refreshAdminResults(data.votes);
+              serverSynced = true;
+            }
+          } catch (e) {
+            console.warn("Failed to reach server, falling back to local storage:", e);
+          }
         }
 
-        const votes = getStoredVotes();
-        votes[this.id] = (votes[this.id] || 0) + 1;
-        saveVotes(votes);
+        if (!serverSynced) {
+          const votes = getStoredVotes();
+          votes[this.id] = (votes[this.id] || 0) + 1;
+          saveVotes(votes);
+          refreshAdminResults(votes);
+        }
+
+        localStorage.setItem("il_election_has_voted", "true");
 
         const now = new Date();
         const timeStr = now.toLocaleDateString("he-IL") + " " + now.toLocaleTimeString("he-IL");
@@ -2250,8 +2334,8 @@
       return { seats, log, qualifying, activePairs, totalValid, thresholdVotes };
     }
 
-    function refreshAdminResults() {
-      const votes = getStoredVotes();
+    function refreshAdminResults(passedVotes) {
+      const votes = passedVotes || getStoredVotes();
       const withSurplus = runBaderOferEngine(votes, true);
       const withoutSurplus = runBaderOferEngine(votes, false);
 
@@ -2473,9 +2557,9 @@
 
       renderAllBallots();
       updateIPStatusUI();
-      refreshAdminResults();
       setupShareLinks();
       generateQRCodeSVG();
+      syncLiveResults(false); // Immediately fetch global live results from server on page load!
 
       if (window.location.protocol.startsWith('http')) {
         fetch('/api/ip').then(r => r.json()).then(data => {
@@ -2917,6 +3001,14 @@
       const txt = document.getElementById("tab-admin-text");
       if (icon) icon.textContent = "📊";
       if (txt) txt.textContent = "ניהול ותוצאות (מחובר)";
+
+      // Toggle in-page containers
+      const lockScreen = document.getElementById("admin-lock-screen");
+      const unlockedContent = document.getElementById("admin-unlocked-content");
+      if (lockScreen) lockScreen.style.display = "none";
+      if (unlockedContent) unlockedContent.style.display = "block";
+
+      startAdminPolling();
     }
 
     function lockAdminSession() {
@@ -2926,6 +3018,15 @@
       const txt = document.getElementById("tab-admin-text");
       if (icon) icon.textContent = "🔒";
       if (txt) txt.textContent = "מסך ניהול ותוצאות";
+
+      const lockScreen = document.getElementById("admin-lock-screen");
+      const unlockedContent = document.getElementById("admin-unlocked-content");
+      if (lockScreen) lockScreen.style.display = "block";
+      if (unlockedContent) unlockedContent.style.display = "none";
+
+      const inpageInput = document.getElementById("inpage-admin-pin-input");
+      if (inpageInput) inpageInput.value = "";
+
       stopAdminPolling();
       switchView("voter");
       showToast("🔒 מסך הניהול ננעל בהצלחה", "info");
@@ -2962,7 +3063,7 @@
               if (lastTimeEl) lastTimeEl.textContent = data.timestamp || new Date().toLocaleTimeString("he-IL");
               if (liveBadge) {
                 liveBadge.style.display = "inline-flex";
-                liveBadge.innerHTML = `<span class="pulse-dot"></span> מסונכרן בזמן אמת מול השרת`;
+                liveBadge.innerHTML = `<span class="pulse-dot"></span> מסונכרן בזמן אמת מול השרת (${(data.voted_count || 0).toLocaleString()} מכשירים)`;
               }
             }
           }
@@ -3007,6 +3108,69 @@
     window.submitAdminPin = submitAdminPin;
     window.lockAdminSession = lockAdminSession;
     window.syncLiveResults = syncLiveResults;
+
+
+    function appendInpagePin(d) {
+      const input = document.getElementById("inpage-admin-pin-input");
+      if (!input || input.value.length >= 6) return;
+      input.value += d;
+      const err = document.getElementById("inpage-admin-pin-error");
+      if (err) err.textContent = "";
+      if (input.value.length === 4 && (input.value === "2026" || input.value === "1234")) {
+        submitInpageAdminPin();
+      }
+    }
+
+    function clearInpagePin() {
+      const input = document.getElementById("inpage-admin-pin-input");
+      if (input) input.value = "";
+      const err = document.getElementById("inpage-admin-pin-error");
+      if (err) err.textContent = "";
+    }
+
+    function deleteInpagePin() {
+      const input = document.getElementById("inpage-admin-pin-input");
+      if (input && input.value.length > 0) {
+        input.value = input.value.slice(0, -1);
+      }
+      const err = document.getElementById("inpage-admin-pin-error");
+      if (err) err.textContent = "";
+    }
+
+    async function submitInpageAdminPin() {
+      const input = document.getElementById("inpage-admin-pin-input");
+      const err = document.getElementById("inpage-admin-pin-error");
+      const val = (input?.value || "").trim();
+
+      let isValid = (val === "2026" || val === "1234");
+      if (!isValid && window.location.protocol.startsWith('http')) {
+        try {
+          const r = await fetch('/api/admin/verify_pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin: val })
+          });
+          const data = await r.json();
+          if (data && data.valid) isValid = true;
+        } catch (e) {}
+      }
+
+      if (isValid) {
+        unlockAdminUI(true);
+        showToast("🔓 כניסה אושרה — לוח הניהול והתוצאות פתוח ומסונכרן", "success");
+      } else {
+        if (err) err.textContent = "❌ קוד גישה שגוי. נסה שוב (קוד: 2026)";
+        if (input) {
+          input.style.borderColor = "#ef4444";
+          setTimeout(() => input.style.borderColor = "#cbd5e1", 1200);
+        }
+      }
+    }
+
+    window.appendInpagePin = appendInpagePin;
+    window.clearInpagePin = clearInpagePin;
+    window.deleteInpagePin = deleteInpagePin;
+    window.submitInpageAdminPin = submitInpageAdminPin;
 
   </script>
 </body>
