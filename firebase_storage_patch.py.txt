@@ -1,0 +1,52 @@
+# Firebase storage patch for election_server.py
+# Apply manually: add imports/initialization near the top, then replace load_data/save_data.
+# This adapter uses a single server instance; see README_HE.md for concurrency notes.
+
+# 1) Add these imports (json and os are already imported in the current file):
+import firebase_admin
+from firebase_admin import credentials, db as firebase_db
+
+# 2) Add this initialization after imports and before load_data() is called.
+# Set FIREBASE_DATABASE_URL and FIREBASE_SERVICE_ACCOUNT_JSON in the hosting environment.
+_firebase_credential_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+_firebase_database_url = os.environ.get("FIREBASE_DATABASE_URL")
+
+if not _firebase_credential_json or not _firebase_database_url:
+    raise RuntimeError(
+        "Firebase is not configured. Set FIREBASE_DATABASE_URL and "
+        "FIREBASE_SERVICE_ACCOUNT_JSON; refusing to fall back to local file storage."
+    )
+
+firebase_admin.initialize_app(
+    credentials.Certificate(json.loads(_firebase_credential_json)),
+    {"databaseURL": _firebase_database_url.rstrip("/")}
+)
+FIREBASE_ROOT = firebase_db.reference("election_data")
+
+
+# 3) Replace the current load_data() and save_data() functions (around lines 453-481)
+# with these functions. Keep the existing db_lock around call sites.
+def _empty_data():
+    return {
+        "voted_devices": {},
+        "voted_ips": {},
+        "votes": {p["id"]: 0 for p in PARTIES},
+        "reset_id": int(datetime.now().timestamp())
+    }
+
+def load_data():
+    data = FIREBASE_ROOT.get()
+    if not isinstance(data, dict):
+        data = _empty_data()
+        FIREBASE_ROOT.set(data)
+    data.setdefault("voted_devices", {})
+    data.setdefault("voted_ips", {})
+    data.setdefault("votes", {})
+    for p in PARTIES:
+        data["votes"].setdefault(p["id"], 0)
+    data.setdefault("reset_id", 0)
+    return data
+
+def save_data(data):
+    # Writes the complete state to the central Firebase path.
+    FIREBASE_ROOT.set(data)
