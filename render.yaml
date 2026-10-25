@@ -6,8 +6,6 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python election_server.py
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.4
       - key: FIREBASE_DATABASE_URL
         sync: false
       - key: FIREBASE_SERVICE_ACCOUNT_JSON

@@ -1,87 +1,31 @@
-# חיבור a1stl ל-Firebase דרך Render
+# a1stl — גרסה עדכנית לפריסה והצבעה ממספר מכשירים
 
-החבילה הזו כוללת קובצי הגדרה והוראות. היא **אינה** כוללת גרסה מלאה ומאומתת של `election_server.py`, כי צריך לבצע את השינויים בקובץ הקיים כדי לשמר את כל נתיבי ה-API והלוגיקה של ההצבעה.
+## קבצים
+- `election_server.py` — שרת Python עם Firebase Realtime Database.
+- `index.html` — הממשק המקורי שסופק, ללא כותרות/שורות עטיפה של ייצוא.
+- `requirements.txt` — תלות Firebase Admin SDK.
+- `render.yaml` — הגדרת Render.
+- `.gitignore` — התעלמות מקובצי סודות.
 
-## מה צריך להיות בפרויקט
-- `election_server.py` — הקובץ הקיים שלך
-- `requirements.txt` — אפשר למזג עם הקיים; אל תדרוס תלויות קיימות
-- `render.yaml` — הגדרת שירות Render
-- `.gitignore` — מונע העלאת קובצי סודות
+## פריסה
+1. העלה/החלף במאגר GitHub `amitaicohen/a1stl` את `election_server.py` ואת `index.html` שבחבילה.
+2. הוסף `requirements.txt` ו-`render.yaml`. אם כבר קיים `requirements.txt`, מזג את תלות Firebase עם התלויות הקיימות.
+3. ב-Render צור Web Service למאגר. Build command: `pip install -r requirements.txt`; Start command: `python election_server.py`.
+4. ב-Render → Environment הוסף:
+   - `FIREBASE_DATABASE_URL` — כתובת ה-Realtime Database המדויקת מ-Firebase Console.
+   - `FIREBASE_SERVICE_ACCOUNT_JSON` — כל תוכן קובץ Service Account JSON, כערך משתנה.
+5. צור את מפתח השירות ב-Firebase Console → Project settings → Service accounts. שמור אותו בסוד: לעולם אל תעלה אותו ל-GitHub ואל תשלח אותו בצ'אט.
+6. בצע Deploy. כתובת השירות של Render תהיה כתובת האתר וה-API. שתף את כתובת Render עם המצביעים.
+7. בדיקה: פתח `https://YOUR-SERVICE.onrender.com/api/results` וודא שמתקבל JSON עם `success: true`. לאחר מכן בדוק בשני מכשירים.
 
-## שלב 1 — הוסף את התלות
-פתח את `requirements.txt` שבמאגר GitHub. אם אין כזה, צור אותו. הוסף שורה:
+## מה תוקן
+- התאמה ל-`PORT` ש-Render מקצה.
+- הגשת `index.html` כשורש האתר.
+- הצבעה ועדכון מונים בתוך Firebase transaction, כך שהכתיבה תהיה אטומית גם כשיש בקשות במקביל.
+- החזרת `reset_id` בתוצאות ואיפוס אטומי.
+- ביטול נתיב הזרקת הצבעות הדמה בפרסום.
 
-    firebase-admin>=6.5,<8
-
-אל תמחק תלויות קיימות אחרות.
-
-## שלב 2 — הוסף את הגדרות Firebase ל-elections_server.py
-פתח את `election_server.py`.
-
-א. ליד שאר ה-imports הוסף את הקוד הבא:
-
-    import os
-    import json
-    import firebase_admin
-    from firebase_admin import credentials, db as firebase_db
-
-ב. אחרי כל ה-imports ולפני הפעלת השרת, הוסף:
-
-    _service_account_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
-    _database_url = os.environ.get("FIREBASE_DATABASE_URL")
-
-    if not _service_account_json or not _database_url:
-        raise RuntimeError(
-            "Missing FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_DATABASE_URL"
-        )
-
-    _credential = credentials.Certificate(json.loads(_service_account_json))
-    firebase_admin.initialize_app(
-        _credential,
-        {"databaseURL": _database_url}
-    )
-    FIREBASE_ROOT = firebase_db.reference("election_data")
-
-ג. מצא את הפונקציות `load_data()` ו-`save_data()` הקיימות. החלף רק את שתי הפונקציות האלה בקוד הבא, ושמור את שמות הפונקציות כדי שכל נתיבי ה-API הקיימים ימשיכו להשתמש בהן:
-
-    def load_data():
-        data = FIREBASE_ROOT.get()
-        if not isinstance(data, dict):
-            data = {
-                "votes": [],
-                "voted_devices": [],
-                "voted_ips": [],
-                "reset_id": 0
-            }
-            FIREBASE_ROOT.set(data)
-        return data
-
-    def save_data(data):
-        FIREBASE_ROOT.set(data)
-
-**חשוב:** יש לוודא שהמבנה הראשוני תואם בדיוק למבנה שהקוד הקיים מצפה לו. אם הקוד הקיים כולל שדות נוספים, הוסף אותם למילון הראשוני לפני פרסום.
-
-## שלב 3 — הגן על קובץ המפתחות
-קובץ JSON פרטי של Service Account לא מעלים ל-GitHub. בחבילה יש `.gitignore` שמכסה שמות נפוצים, אבל עדיין בדוק ידנית לפני commit.
-
-## שלב 4 — פרסום ב-Render
-1. צור חשבון ב-https://render.com/ והתחבר ל-GitHub.
-2. בחר New → Web Service ובחר את המאגר `amitaicohen/a1stl`.
-3. Runtime: Python.
-4. Build Command: `pip install -r requirements.txt`
-5. Start Command: `python election_server.py`
-6. הוסף Environment Variables:
-   - `FIREBASE_DATABASE_URL` = כתובת ה-Realtime Database המדויקת מה-Firebase Console
-   - `FIREBASE_SERVICE_ACCOUNT_JSON` = כל תוכן קובץ ה-Service Account JSON, כמחרוזת JSON אחת. אין להוסיף מרכאות חיצוניות מעבר לתוכן הקובץ.
-7. צור את השירות והמתן לפריסה. אם יש שגיאה, בדוק Logs.
-
-## שלב 5 — בדיקה
-- פתח את כתובת השירות ב-Render ובדוק אם נתיב הבסיס מגיב (ייתכן שהשרת לא מציג עמוד בבסיס).
-- בדוק את ה-endpoint `/api/results` בכתובת Render.
-- יש לעדכן את האתר הסטטי כך שבקשות API יפנו לכתובת Render. כרגע צריך לבדוק את `index.html` ולוודא שכל `fetch('/api/...')` או נתיב יחסי אחר הוחלף בבסיס URL של Render.
-- פתח את האתר בשני דפדפנים, הצבע במכשיר אחד ובדוק שהשני רואה את התוצאה.
-
-## אזהרות חשובות
-- הקוד הקיים משתמש בנעילה מקומית (`threading.Lock`) ובדיקות הצבעה כפולה מבוססות נתונים. נעילה מקומית אינה מספיקה כאשר יש כמה תהליכי שרת, והפעולה read-modify-write על Firebase אינה אטומית. לצורך פיילוט קטן, הגדר instance אחד; עבור מערכת אמינה צריך להשתמש ב-Firebase transactions או במנגנון אטומי.
-- אם הקוד מכיל PIN מנהל קבוע או endpoint להזרקת הצבעות בדיקה, יש להקשיח/להסיר אותם לפני שימוש ציבורי.
-- אין להשתמש בפתרון הזה לבחירות רשמיות או לתהליך שבו נדרשת שלמות הצבעה מאומתת.
+## אבטחה
+- בקוד המנהל עדיין קיימים קודי PIN קבועים `2026` ו-`1234`; החלף אותם לפני פרסום לציבור.
+- מזהה דפדפן אינו מונע הצבעה חוזרת ממכשיר אחר או לאחר מחיקת נתוני דפדפן. אין להשתמש במערכת לבחירות רשמיות.
+- החבילה אינה מבצעת Deploy לחשבונות שלך ואינה מוכיחה שהגדרות Firebase נכונות; יש לבצע את ההגדרות ולבדוק את השירות בפועל.

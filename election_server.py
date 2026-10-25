@@ -12,13 +12,14 @@ import json
 import os
 import sys
 import threading
+import uuid
 from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, db as firebase_db
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", "8000"))
 DATA_FILE = "elections_data.json"
-HTML_FILE = "israel_elections_app.html"
+HTML_FILE = "index.html"
 
 # מנעול לסנכרון כתיבה בטוחה לקובץ הנתונים בריבוי נימים (Thread-Safety)
 db_lock = threading.Lock()
@@ -568,6 +569,7 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                     "votes": votes,
                     "total_votes": total_votes,
                     "voted_count": voted_cnt,
+                    "reset_id": data.get("reset_id", 0),
                     "timestamp": datetime.now().strftime("%H:%M:%S")
                 }
             self.send_json(res)
@@ -600,46 +602,64 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({"error": "מפלגה לא חוקית"}, 400)
                 return
 
-            with db_lock:
-                data = load_data()
-                voted_devs = data.setdefault("voted_devices", {})
-                voted_ips = data.setdefault("voted_ips", {})
+            request_token = str(uuid.uuid4())
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                # אכיפת הצבעה אחת למכשיר (מאפשר למאות מכשירים שונים ברשת/Wi-Fi להצביע במקביל!)
-                if device_id in voted_devs:
-                    self.send_json({
-                        "error": "מכשיר זה כבר ביצע הצבעה במערכת זו.",
-                        "already_voted": True,
-                        "votes": data["votes"],
-                        "total_votes": sum(data["votes"].values()),
-                        "voted_count": len(voted_devs)
-                    }, 403)
-                    return
+            def apply_vote(current):
+                if not isinstance(current, dict):
+                    current = _empty_data()
+                current.setdefault("voted_devices", {})
+                current.setdefault("voted_ips", {})
+                current.setdefault("votes", {})
+                for party in PARTIES:
+                    current["votes"].setdefault(party["id"], 0)
 
-                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                voted_devs[device_id] = {
+                if device_id in current["voted_devices"]:
+                    return current
+
+                current["voted_devices"][device_id] = {
                     "party_id": party_id,
                     "party_letter": valid["letter"],
                     "party_name": valid["name"],
                     "ip": client_ip,
-                    "timestamp": now
+                    "timestamp": now,
+                    "_request_token": request_token
                 }
-                voted_ips[client_ip] = {
+                current["voted_ips"][client_ip] = {
                     "party_id": party_id,
                     "timestamp": now
                 }
-                data.setdefault("votes", {})[party_id] = data.get("votes", {}).get(party_id, 0) + 1
-                save_data(data)
+                current["votes"][party_id] = int(current["votes"].get(party_id, 0)) + 1
+                current.setdefault("reset_id", 0)
+                return current
 
-                total_v = sum(data["votes"].values())
-                voted_cnt = len(voted_devs)
-                updated_votes = dict(data["votes"])
+            try:
+                committed = FIREBASE_ROOT.transaction(apply_vote)
+            except Exception as exc:
+                print(f"Firebase vote transaction failed: {exc}")
+                self.send_json({"error": "לא ניתן לשמור את ההצבעה כרגע. נסו שוב."}, 503)
+                return
+
+            committed = committed if isinstance(committed, dict) else {}
+            voted_devs = committed.get("voted_devices", {})
+            saved_vote = voted_devs.get(device_id, {}) if isinstance(voted_devs, dict) else {}
+            votes = committed.get("votes", {})
+
+            if saved_vote.get("_request_token") != request_token:
+                self.send_json({
+                    "error": "מכשיר זה כבר ביצע הצבעה במערכת זו.",
+                    "already_voted": True,
+                    "votes": votes,
+                    "total_votes": sum(votes.values()) if isinstance(votes, dict) else 0,
+                    "voted_count": len(voted_devs) if isinstance(voted_devs, dict) else 0
+                }, 403)
+                return
 
             self.send_json({
                 "success": True,
-                "votes": updated_votes,
-                "total_votes": total_v,
-                "voted_count": voted_cnt,
+                "votes": votes,
+                "total_votes": sum(votes.values()) if isinstance(votes, dict) else 0,
+                "voted_count": len(voted_devs) if isinstance(voted_devs, dict) else 0,
                 "party": valid["name"],
                 "letter": valid["letter"]
             })
@@ -656,48 +676,31 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             if pin not in ["2026", "1234"]:
                 self.send_json({"error": "קוד גישה שגוי"}, 401)
                 return
-            with db_lock:
-                data = {
+            def reset_data(_current):
+                return {
                     "voted_devices": {},
                     "voted_ips": {},
-                    "votes": {p["id"]: 0 for p in PARTIES}
+                    "votes": {p["id"]: 0 for p in PARTIES},
+                    "reset_id": int(datetime.now().timestamp())
                 }
-                save_data(data)
-                res_votes = dict(data["votes"])
-            self.send_json({"success": True, "votes": res_votes, "total_votes": 0, "voted_count": 0})
+            try:
+                data = FIREBASE_ROOT.transaction(reset_data)
+            except Exception as exc:
+                print(f"Firebase reset transaction failed: {exc}")
+                self.send_json({"error": "איפוס נכשל. נסו שוב."}, 503)
+                return
+            res_votes = dict(data.get("votes", {}))
+            self.send_json({
+                "success": True,
+                "votes": res_votes,
+                "total_votes": 0,
+                "voted_count": 0,
+                "reset_id": data.get("reset_id", 0)
+            })
             return
 
         if path == "/api/admin/inject":
-            pin = str(payload.get("pin", "")).strip()
-            if pin not in ["2026", "1234"]:
-                self.send_json({"error": "קוד גישה שגוי"}, 401)
-                return
-            sample_weights = {
-                "mahal": 2600,
-                "rak": 2300,
-                "ken": 1300,
-                "lamed": 1100,
-                "shas": 1000,
-                "emet": 900,
-                "bet": 800,
-                "gimel": 800,
-                "tet": 500,
-                "vdm": 500,
-                "am": 500,
-                "derech": 400,
-                "kach": 400,
-                "day": 400,
-                "blank": 120,
-            }
-            with db_lock:
-                data = load_data()
-                for pid, cnt in sample_weights.items():
-                    data.setdefault("votes", {})[pid] = data.get("votes", {}).get(pid, 0) + cnt
-                save_data(data)
-                res_votes = dict(data["votes"])
-                tot_v = sum(res_votes.values())
-                cnt_dev = len(data.get("voted_devices", {})) + 10000
-            self.send_json({"success": True, "votes": res_votes, "total_votes": tot_v, "voted_count": cnt_dev})
+            self.send_json({"error": "הנתיב אינו זמין בגרסת הפרסום"}, 404)
             return
 
         self.send_json({"error": "Not found"}, 404)
