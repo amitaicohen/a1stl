@@ -1,96 +1,111 @@
-#!/usr/bin/env python3
-"""
-שרת בחירות 2026 לכנסת ה-26 (גרסה 4.0 - Multi-Device Concurrency & Live Sync)
-שרת HTTP ו-REST API מבוסס ThreadingTCPServer עם סנכרון רשת מלא.
-תומך בהצבעה סימולטנית ממאות מכשירים במקביל (טלפונים, טאבלטים ומחשבים) לאותן תוצאות אמת.
-"""
+                if device_id in voted_devs:
+                    self.send_json({
+                        "error": "מכשיר זה כבר ביצע הצבעה במערכת זו.",
+                        "already_voted": True,
+                        "votes": data["votes"],
+                        "total_votes": sum(data["votes"].values()),
+                        "voted_count": len(voted_devs)
+                    }, 403)
+                    return
 
-import http.server
-import socketserver
-import urllib.parse
-import json
-import os
-import sys
-import threading
-import uuid
-from datetime import datetime
-import firebase_admin
-from firebase_admin import credentials, db as firebase_db
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                voted_devs[device_id] = {
+                    "party_id": party_id,
+                    "party_letter": valid["letter"],
+                    "party_name": valid["name"],
+                    "ip": client_ip,
+                    "timestamp": now
+                }
+                voted_ips[client_ip] = {
+                    "party_id": party_id,
+                    "timestamp": now
+                }
+                data.setdefault("votes", {})[party_id] = data.get("votes", {}).get(party_id, 0) + 1
+                save_data(data)
 
-PORT = int(os.environ.get("PORT", "8000"))
-DATA_FILE = "elections_data.json"
-HTML_FILE = "index.html"
+                total_v = sum(data["votes"].values())
+                voted_cnt = len(voted_devs)
+                updated_votes = dict(data["votes"])
 
-# מנעול לסנכרון כתיבה בטוחה לקובץ הנתונים בריבוי נימים (Thread-Safety)
-db_lock = threading.Lock()
+            self.send_json({
+                "success": True,
+                "votes": updated_votes,
+                "total_votes": total_v,
+                "voted_count": voted_cnt,
+                "party": valid["name"],
+                "letter": valid["letter"]
+            })
+            return
 
-PARTIES = [
-  {
-    "id": "mahal",
-    "letter": "מחל",
-    "name": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה",
-    "short": "הליכוד",
-    "leader": "בנימין נתניהו",
-    "color": "#1877f2",
-    "bloc": "right",
-    "ballot_sub": "הליכוד בהנהגת בנימין נתניהו לראשות הממשלה",
-    "surplus_partner": "tet",
-    "candidates": [
-      "1. בנימין נתניהו (יו\"ר הליכוד וראש הממשלה)",
-      "2. אליהו כהן (מקום 1 בפריימריז, שר החוץ והאנרגיה)",
-      "3. אמיר אוחנה (יו\"ר הכנסת)",
-      "4. יריב גדעון לוין (שר המשפטים וסגן ראש הממשלה)",
-      "5. מרים (מירי) רגב (שרת התחבורה והבטיחות בדרכים)",
-      "6. ישראל כ\"ץ (שר הביטחון)",
-      "7. גדעון משה סער (יו\"ר הימין הממלכתי / שר החוץ)",
-      "8. אופיר כ\"ץ (יו\"ר הקואליציה ויו\"ר סיעת הליכוד)",
-      "9. טליק (טלי) גואילי (אמו של רן גואילי הי\"ד, שריון יו\"ר)",
-      "10. יואב קיש (שר החינוך)"
-    ],
-    "platform": {
-      "security": "הכרעה צבאית מוחלטת נגד הטרור, פירוק חמאס, שמירת חופש פעולה ביטחוני בכל הגזרות, התנגדות למדינה פלסטינית והרחבת הסכמי אברהם.",
-      "economy": "כלכלת שוק חופשי, עידוד יזמות והייטק, הפחתת רגולציה ומסים, השקעה מסיבית בתשתיות לאומיות והורדת יוקר המחיה.",
-      "education": "חיזוק החינוך הלאומי והציוני, הרחבת חינוך חינם לגילאי 0-3, שיפור מעמד המורה ומצוינות מדעית וטכנולוגית.",
-      "enlistment": "הסדרת מעמד בני הישיבות בהסכמה והדרגתיות, שילוב מסלולים ייעודיים לחרדים בצה\"ל ובשירות אזרחי תוך שימור עולם התורה."
-    }
-  },
-  {
-    "id": "rak",
-    "letter": "רק",
-    "name": "ביחד בראשות נפתלי בנט",
-    "short": "ביחד",
-    "leader": "נפתלי בנט ויאיר לפיד",
-    "color": "#2563eb",
-    "bloc": "center_left",
-    "ballot_sub": "ביחד בראשות נפתלי בנט (בנט 2026 ויש עתיד)",
-    "surplus_partner": "derech",
-    "candidates": [
-      "1. נפתלי בנט (יו\"ר הרשימה, ראש ממשלת ישראל לשעבר)",
-      "2. יאיר לפיד (ראש הממשלה ושר החוץ לשעבר, יו\"ר יש עתיד)",
-      "3. קרן טרנר אייל (מנכ\"לית משרדי האוצר והתחבורה לשעבר)",
-      "4. מירב בן ארי (חברת כנסת ויו\"ר ועדת ביטחון פנים לשעבר)",
-      "5. לירן אבישר בן חורין (מנכ\"לית משרד התקשורת לשעבר)",
-      "6. אלוף במיל' נעם תיבון (מפקד הגיס הצפוני לשעבר ואיש ביטחון)",
-      "7. מיכל הירש נגרי (מנכ\"לית עיריית רעננה לשעבר ואשת ניהול)",
-      "8. איתן גינזבורג (חבר כנסת, סגן יו\"ר הכנסת וראש עיריית רעננה לשעבר)",
-      "9. מירב כהן (שרת השוויון החברתי לשעבר)",
-      "10. יונתן שלו (איש עסקים, יזם ופעיל חברתי)"
-    ],
-    "platform": {
-      "security": "יוזמה והתקפיות ביטחונית, הכאת ראש התמנון האיראני, שיקום עוטף עזה והצפון, ובניית צה\"ל כצבא גדול, טכנולוגי וקטלני.",
-      "economy": "כלכלה חופשית ויזמית, רפורמות עומק להפחתת מיסוי, שבירת קרטלים ומכסי מגן, והובלה עולמית בבינה מלאכותית ואנרגיה.",
-      "education": "זינוק למצוינות מתמטית וטכנולוגית, חיזוק ערכי הציונות והערבות ההדדית, ושילוב לימודי ליב\"ה ומקצועות העתיד בכל זרמי החינוך.",
-      "enlistment": "הרחבת שורות צה\"ל בדחיפות: גיוס חטיבות חרדיות לוחמות, אכיפת חוק גיוס אפקטיבי ללא פשרות, והוקרה חסרת תקדים ללוחמים."
-    }
-  },
-  {
-    "id": "ken",
-    "letter": "כן",
-    "name": "כחול לבן בהנהגת בני גנץ",
-    "short": "כחול לבן",
-    "leader": "בני גנץ",
-    "color": "#002b49",
-    "bloc": "center_left",
-    "ballot_sub": "כחול לבן בהנהגת בני גנץ",
-    "surplus_partner": "emet",
-    "candidates": [
+        if path == "/api/admin/verify_pin":
+            pin = str(payload.get("pin", "")).strip()
+            is_valid = (pin in ["2026", "1234"])
+            self.send_json({"valid": is_valid})
+            return
+
+        if path == "/api/admin/reset":
+            pin = str(payload.get("pin", "")).strip()
+            if pin not in ["2026", "1234"]:
+                self.send_json({"error": "קוד גישה שגוי"}, 401)
+                return
+            with db_lock:
+                data = {
+                    "voted_devices": {},
+                    "voted_ips": {},
+                    "votes": {p["id"]: 0 for p in PARTIES}
+                }
+                save_data(data)
+                res_votes = dict(data["votes"])
+            self.send_json({"success": True, "votes": res_votes, "total_votes": 0, "voted_count": 0})
+            return
+
+        if path == "/api/admin/inject":
+            pin = str(payload.get("pin", "")).strip()
+            if pin not in ["2026", "1234"]:
+                self.send_json({"error": "קוד גישה שגוי"}, 401)
+                return
+            sample_weights = {
+                "mahal": 2600,
+                "rak": 2300,
+                "ken": 1300,
+                "lamed": 1100,
+                "shas": 1000,
+                "emet": 900,
+                "bet": 800,
+                "gimel": 800,
+                "tet": 500,
+                "vdm": 500,
+                "am": 500,
+                "derech": 400,
+                "kach": 400,
+                "day": 400,
+                "blank": 120,
+            }
+            with db_lock:
+                data = load_data()
+                for pid, cnt in sample_weights.items():
+                    data.setdefault("votes", {})[pid] = data.get("votes", {}).get(pid, 0) + cnt
+                save_data(data)
+                res_votes = dict(data["votes"])
+                tot_v = sum(res_votes.values())
+                cnt_dev = len(data.get("voted_devices", {})) + 10000
+            self.send_json({"success": True, "votes": res_votes, "total_votes": tot_v, "voted_count": cnt_dev})
+            return
+
+        self.send_json({"error": "Not found"}, 404)
+
+if __name__ == "__main__":
+    load_data()
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else PORT
+    try:
+        with ThreadingElectionServer(("", port), ElectionHandler) as httpd:
+            print(f"\n✓ שרת הבחירות (גרסה 4.0 רב-מכשיר סימולטני) פועל בכתובת: http://localhost:{port}")
+            print(f"לתמיכה בריבוי מכשירים וסנכרון חי, השרת מאפשר למאות מכשירים להצביע במקביל.")
+            print(f"לעצירת השרת: Ctrl + C\n")
+            httpd.serve_forever()
+    except OSError as e:
+        if e.errno == 98:
+            print(f"\n⚠️ פורט {port} כבר תפוס על ידי שרת שרץ ברקע!")
+            print(f"👉 לשחרור הפורט הרץ:  fuser -k {port}/tcp  או  pkill -f election_server.py")
+            print(f"👉 או הרץ על פורט אחר:  python3 election_server.py {port+1}\n")
+        sys.exit(1)
