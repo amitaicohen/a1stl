@@ -1916,6 +1916,9 @@
   }
 ];
 
+    // Expose shared data for diagnostics without changing the app logic.
+    window.PARTIES = PARTIES;
+
     let currentIP = "192.168.1.101";
     let categoryFilter = "all";
     let ballotObjects = [];
@@ -2575,6 +2578,11 @@
       window.ballotObjects = ballotObjects;
 
       renderAllBallots();
+      // Keep a visible diagnostic if a future change prevents cards from rendering.
+      const ballotGrid = document.getElementById("ballots-grid");
+      if (ballotGrid && ballotGrid.children.length === 0) {
+        ballotGrid.innerHTML = '<div class="error" role="status" style="padding:16px;margin:12px;border:1px solid #fca5a5;border-radius:12px;background:#fff1f2;color:#991b1b;grid-column:1/-1">לא נטענו פתקי הצבעה. רעננו את הדף; אם התקלה נמשכת, בדקו את שגיאות JavaScript בקונסולה.</div>';
+      }
       updateIPStatusUI();
       setupShareLinks();
       generateQRCodeSVG();
@@ -2634,6 +2642,9 @@
     }
 
     window.renderAllBallots = renderAllBallots;
+    // Compatibility aliases for browser-console diagnostics and older UI hooks.
+    window.loadBallots = renderAllBallots;
+    window.loadResults = () => syncLiveResults(false);
 
     function filterBallots() { renderAllBallots(); }
     function setCategoryFilter(cat, btn) {
