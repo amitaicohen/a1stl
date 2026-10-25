@@ -617,26 +617,7 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 if device_id in current["voted_devices"]:
                     return current
 
-                current["voted_devices"][device_id] = {
-                    "party_id": party_id,
-                    "party_letter": valid["letter"],
-                    "party_name": valid["name"],
-                    "ip": client_ip,
-                    "timestamp": now,
-                    "_request_token": request_token
-                }
-                current["voted_ips"][client_ip] = {
-                    "party_id": party_id,
-                    "timestamp": now
-                }
-                current["votes"][party_id] = int(current["votes"].get(party_id, 0)) + 1
-                current.setdefault("reset_id", 0)
-                return current
-
-            try:
-               committed = FIREBASE_ROOT.transaction(apply_vote)
-         
-
+               
             try:
                 committed = FIREBASE_ROOT.transaction(apply_vote)
             except Exception as exc:
@@ -651,11 +632,10 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
             committed = committed if isinstance(committed, dict) else {}
-          
-            committed = committed if isinstance(committed, dict) else {}
             voted_devs = committed.get("voted_devices", {})
             saved_vote = voted_devs.get(device_id, {}) if isinstance(voted_devs, dict) else {}
             votes = committed.get("votes", {})
+
 
             if saved_vote.get("_request_token") != request_token:
                 self.send_json({
