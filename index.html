@@ -2044,24 +2044,35 @@
       }
 
       async submitVote() {
+        if (this._voteInProgress) return;
         if (hasCurrentDeviceVoted()) {
           showToast("⛔ מכשיר זה כבר ביצע הצבעה במערכת הבחירות!", "error");
           return;
         }
-
+        this._voteInProgress = true;
+        const card = document.getElementById("ballot-card-" + this.id);
+        if (card) card.style.pointerEvents = "none";
         const devId = getOrCreateDeviceId();
         const votePayload = {
-          party_id: this.id,
-          voter_device_id: devId,
-          letter: this.letter,
-          name: this.name,
-          short: this.short,
-          voter_ip: currentIP,
+          party_id: this.id, voter_device_id: devId, letter: this.letter,
+          name: this.name, short: this.short, voter_ip: currentIP,
           timestamp: new Date().toISOString()
         };
-
-        this.playEnvelopeAnimation();
-        await this.sendVoteToDatabase(votePayload);
+        try {
+          const saved = await this.sendVoteToDatabase(votePayload);
+          if (!saved) {
+            showToast("לא התקבל אישור מהשרת. ההצבעה לא אושרה; אפשר לנסות שוב.", "error");
+            this._voteInProgress = false;
+            renderAllBallots();
+            return;
+          }
+          this.playEnvelopeAnimation();
+        } catch (e) {
+          console.error("Vote submission failed:", e);
+          showToast("שגיאה בשמירת ההצבעה. הפתק נשאר זמין לניסיון נוסף.", "error");
+          this._voteInProgress = false;
+          renderAllBallots();
+        }
       }
 
       playEnvelopeAnimation() {
@@ -2097,51 +2108,46 @@
       }
 
       async sendVoteToDatabase(payload) {
-        let serverSynced = false;
-        if (window.location.protocol.startsWith('http')) {
-          try {
-            const res = await fetch('/api/vote', {
-              method: 'POST',
-              headers: { 
-                'Content-Type': 'application/json',
-                'X-Voter-Device-Id': payload.voter_device_id || getOrCreateDeviceId()
-              },
-              body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data && data.votes) {
-              saveVotes(data.votes); // Save shared server votes!
-              refreshAdminResults(data.votes);
-              serverSynced = true;
-            }
-          } catch (e) {
-            console.warn("Failed to reach server, falling back to local storage:", e);
+        // Require an explicit successful response from the server.
+        if (!window.location.protocol.startsWith("http")) {
+          showToast("ההצבעה זמינה רק דרך השרת הפעיל.", "error");
+          return false;
+        }
+        try {
+          const res = await fetch("/api/vote", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Voter-Device-Id": payload.voter_device_id || getOrCreateDeviceId()
+            },
+            body: JSON.stringify(payload)
+          });
+          let data = {};
+          try { data = await res.json(); } catch (_) {}
+          if (!res.ok || data.success !== true || !data.votes) {
+            console.error("Vote API did not confirm the vote:", res.status, data);
+            return false;
           }
+          saveVotes(data.votes);
+          refreshAdminResults(data.votes);
+          localStorage.setItem("il_election_has_voted", "true");
+          const now = new Date();
+          const timeStr = now.toLocaleDateString("he-IL") + " " + now.toLocaleTimeString("he-IL");
+          const votedIPs = getVotedIPs();
+          votedIPs[currentIP] = {
+            timestamp: timeStr, partyId: this.id,
+            partyName: this.name, partyLetter: this.letter
+          };
+          saveVotedIPs(votedIPs);
+          updateIPStatusUI();
+          return true;
+        } catch (e) {
+          console.error("Failed to submit vote:", e);
+          return false;
         }
-
-        if (!serverSynced) {
-          const votes = getStoredVotes();
-          votes[this.id] = (votes[this.id] || 0) + 1;
-          saveVotes(votes);
-          refreshAdminResults(votes);
-        }
-
-        localStorage.setItem("il_election_has_voted", "true");
-
-        const now = new Date();
-        const timeStr = now.toLocaleDateString("he-IL") + " " + now.toLocaleTimeString("he-IL");
-        const votedIPs = getVotedIPs();
-        votedIPs[currentIP] = {
-          timestamp: timeStr,
-          partyId: this.id,
-          partyName: this.name,
-          partyLetter: this.letter
-        };
-        saveVotedIPs(votedIPs);
-
-        updateIPStatusUI();
       }
     }
+
 
     // ==============================================================
     // FLOATING & MODAL PLATFORM SLIDE DISPLAY
