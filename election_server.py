@@ -634,17 +634,23 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                 return current
 
             try:
-                committed = FIREBASE_ROOT.transaction(apply_vote)
+               committed = FIREBASE_ROOT.transaction(apply_vote)
          
 
-except Exception as exc:
-    print(f"Firebase vote transaction failed: {type(exc).__name__}: {exc}", flush=True)
-    self.send_json(
-        {"error": "לא ניתן לשמור את ההצבעה כרגע. נסו שוב."},
-        503
-    )
-    return
+            try:
+                committed = FIREBASE_ROOT.transaction(apply_vote)
+            except Exception as exc:
+                print(
+                    f"Firebase vote transaction failed: {type(exc).__name__}: {exc}",
+                    flush=True
+                )
+                self.send_json(
+                    {"error": "לא ניתן לשמור את ההצבעה כרגע. נסו שוב."},
+                    503
+                )
+                return
 
+            committed = committed if isinstance(committed, dict) else {}
           
             committed = committed if isinstance(committed, dict) else {}
             voted_devs = committed.get("voted_devices", {})
