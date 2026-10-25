@@ -1,3 +1,4 @@
 # Python Standard Library only
 # No external pip dependencies required!
 # Python >= 3.8 recommended
+firebase-admin>=6.5,<8
