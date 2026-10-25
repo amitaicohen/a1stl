@@ -1,4 +1,7 @@
-                if device_id in voted_devs:
+
+#!/usr/bin/env python3
+
+if device_id in voted_devs:
                     self.send_json({
                         "error": "מכשיר זה כבר ביצע הצבעה במערכת זו.",
                         "already_voted": True,
