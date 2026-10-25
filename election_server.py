@@ -645,6 +645,22 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                     return
 
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+for label, key in (
+    ("device_id", device_id),
+    ("client_ip", client_ip),
+):
+    if (
+        not isinstance(key, str)
+        or not key
+        or any(char in key for char in ".$#[]/")
+    ):
+        print(f"Invalid Firebase key: {label}")
+        self.send_json(
+            {"error": "מזהה המצביע אינו תקין. יש לנסות שוב."},
+            400
+        )
+        return
+              
                 voted_devs[device_id] = {
                     "party_id": party_id,
                     "party_letter": valid["letter"],
