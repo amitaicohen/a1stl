@@ -2597,7 +2597,15 @@
       if (!grid) return;
       grid.innerHTML = "";
 
-      const query = (document.getElementById("voter-search")?.value || "").trim().toLowerCase();
+      const searchInput = document.getElementById("voter-search");
+      let query = (searchInput?.value || "").trim().toLowerCase();
+
+      // Safety guard: if a URL was accidentally pasted into the ballot search box,
+      // clear it instead of filtering every ballot out and leaving the grid empty.
+      if (query && (/(https?:\/\/|www\.)/i.test(query) || /\.onrender\.com|\.com\b|\.org\b|\.net\b/i.test(query))) {
+        if (searchInput) searchInput.value = "";
+        query = "";
+      }
 
       const filtered = ballotObjects.filter(b => {
         if (categoryFilter === "knesset" && (b.id === "blank" || b.bloc === "new" || b.bloc === "other" || b.id === "kach" || b.id === "rak" || b.id === "derech")) return false;
