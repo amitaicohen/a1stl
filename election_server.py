@@ -456,37 +456,47 @@ PARTIES = [
   }
 ]
 
+
+_firebase_credential_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+_firebase_database_url = os.environ.get("FIREBASE_DATABASE_URL")
+
+if not _firebase_credential_json or not _firebase_database_url:
+    raise RuntimeError(
+        "Firebase is not configured. Set FIREBASE_DATABASE_URL and "
+        "FIREBASE_SERVICE_ACCOUNT_JSON; refusing to fall back to local file storage."
+    )
+
+firebase_admin.initialize_app(
+    credentials.Certificate(json.loads(_firebase_credential_json)),
+    {"databaseURL": _firebase_database_url.rstrip("/")}
+)
+FIREBASE_ROOT = firebase_db.reference("election_data")
+
+
+def _empty_data():
+    return {
+        "voted_devices": {},
+        "voted_ips": {},
+        "votes": {p["id"]: 0 for p in PARTIES},
+        "reset_id": int(datetime.now().timestamp())
+    }
+
 def load_data():
-    if not os.path.exists(DATA_FILE):
-        initial = {
-            "voted_devices": {},
-            "voted_ips": {},
-            "votes": {p["id"]: 0 for p in PARTIES}
-        }
-        save_data(initial)
-        return initial
-    try:
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            data.setdefault("voted_devices", {})
-            data.setdefault("voted_ips", {})
-            data.setdefault("votes", {p["id"]: 0 for p in PARTIES})
-            for p in PARTIES:
-                data["votes"].setdefault(p["id"], 0)
-            return data
-    except Exception:
-        initial = {
-            "voted_devices": {},
-            "voted_ips": {},
-            "votes": {p["id"]: 0 for p in PARTIES}
-        }
-        save_data(initial)
-        return initial
+    data = FIREBASE_ROOT.get()
+    if not isinstance(data, dict):
+        data = _empty_data()
+        FIREBASE_ROOT.set(data)
+    data.setdefault("voted_devices", {})
+    data.setdefault("voted_ips", {})
+    data.setdefault("votes", {})
+    for p in PARTIES:
+        data["votes"].setdefault(p["id"], 0)
+    data.setdefault("reset_id", 0)
+    return data
 
 def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
+    # Writes the complete state to the central Firebase path.
+    FIREBASE_ROOT.set(data)
 class ThreadingElectionServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     allow_reuse_address = True
