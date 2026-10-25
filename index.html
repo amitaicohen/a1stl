@@ -2560,7 +2560,9 @@
     // ==============================================================
     // APP INITIALIZATION & NAVIGATION
     // ==============================================================
-        window.addEventListener("DOMContentLoaded", () => {
+        function initializeElectionApp() {
+      if (window.__electionAppInitialized) return;
+      window.__electionAppInitialized = true;
       if (sessionStorage.getItem("admin_session_unlocked") === "true") {
         unlockAdminUI(false);
       }
@@ -2590,7 +2592,14 @@
           }
         }).catch(() => {});
       }
-    });
+    }
+
+    // Initialize whether this script runs before or after DOMContentLoaded.
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initializeElectionApp, { once: true });
+    } else {
+      initializeElectionApp();
+    }
 
     function renderAllBallots() {
       const grid = document.getElementById("ballots-grid");
@@ -2623,6 +2632,8 @@
 
       filtered.forEach(b => grid.appendChild(b.renderElement()));
     }
+
+    window.renderAllBallots = renderAllBallots;
 
     function filterBallots() { renderAllBallots(); }
     function setCategoryFilter(cat, btn) {
