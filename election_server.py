@@ -493,9 +493,37 @@ def load_data():
         data["votes"].setdefault(p["id"], 0)
     data.setdefault("reset_id", 0)
     return data
-
 def save_data(data):
-    # Writes the complete state to the central Firebase path.
+    forbidden = set(".$#[]/")
+
+    def find_invalid_keys(obj, path="$"):
+        problems = []
+
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if (
+                    not isinstance(key, str)
+                    or not key
+                    or any(char in key for char in forbidden)
+                ):
+                    # לא מדפיסים את תוכן המפתח, כדי לא לחשוף פרטים אישיים
+                    problems.append(path)
+
+                problems.extend(find_invalid_keys(value, path + "/..."))
+
+        elif isinstance(obj, list):
+            for value in obj:
+                problems.extend(find_invalid_keys(value, path + "/[]"))
+
+        return problems
+
+    problems = find_invalid_keys(data)
+
+    if problems:
+        raise ValueError(
+            f"Invalid Firebase key detected at: {', '.join(problems)}"
+        )
+
     FIREBASE_ROOT.set(data)
 class ThreadingElectionServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
