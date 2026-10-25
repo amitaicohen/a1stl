@@ -13,6 +13,8 @@ import os
 import sys
 import threading
 from datetime import datetime
+import firebase_admin
+from firebase_admin import credentials, db as firebase_db
 
 PORT = 8000
 DATA_FILE = "elections_data.json"
