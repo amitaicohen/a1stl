@@ -1,11 +1,14 @@
-FROM python:3.11-alpine
+
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy application files
-COPY election_server.py israel_elections_app.html ./
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY election_server.py .
+COPY index.html .
 
 EXPOSE 8000
 
-# Run standalone server
-CMD ["python", "election_server.py", "8000"]
+CMD ["python", "election_server.py"]
