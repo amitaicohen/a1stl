@@ -1,0 +1,40 @@
+# Add imports near the top of election_server.py:
+import os
+import json
+import firebase_admin
+from firebase_admin import credentials, db as firebase_db
+
+# Add once after imports and before server startup:
+_service_account_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+_database_url = os.environ.get("FIREBASE_DATABASE_URL")
+
+if not _service_account_json or not _database_url:
+    raise RuntimeError(
+        "Missing FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_DATABASE_URL"
+    )
+
+_credential = credentials.Certificate(json.loads(_service_account_json))
+firebase_admin.initialize_app(
+    _credential,
+    {"databaseURL": _database_url}
+)
+FIREBASE_ROOT = firebase_db.reference("election_data")
+
+
+# Replace the existing load_data() and save_data() functions with these.
+# First verify that this default structure matches the existing application.
+def load_data():
+    data = FIREBASE_ROOT.get()
+    if not isinstance(data, dict):
+        data = {
+            "votes": [],
+            "voted_devices": [],
+            "voted_ips": [],
+            "reset_id": 0
+        }
+        FIREBASE_ROOT.set(data)
+    return data
+
+
+def save_data(data):
+    FIREBASE_ROOT.set(data)

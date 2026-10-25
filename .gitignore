@@ -1,25 +1,5 @@
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-
-# Virtual environments
+# Firebase/service account credentials — never commit secrets
+*service-account*.json
+*firebase-adminsdk*.json
 .env
-.venv
-env/
-venv/
-ENV/
-
-# Runtime data & voter records
-elections_data.json
-elections.db
-*.log
-
-# OS & Editor files
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.swp
+.env.*
