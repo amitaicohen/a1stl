@@ -498,29 +498,6 @@ def load_data():
 def save_data(data):
     forbidden = set(".$#[]/")
 
-    def validate_keys(obj, path="$"):
-        if isinstance(obj, dict):
-            for key, value in obj.items():
-                if (
-                    not isinstance(key, str)
-                    or not key
-                    or any(char in key for char in forbidden)
-                ):
-                    raise ValueError(
-                        f"Invalid Firebase key at {path}; "
-                        "key value intentionally omitted"
-                    )
-                validate_keys(value, path + "/...")
-
-        elif isinstance(obj, list):
-            for value in obj:
-                validate_keys(value, path + "/[]")
-
-    validate_keys(data)
-    FIREBASE_ROOT.set(data)
-
-    forbidden = set(".$#[]/")
-
     def find_invalid_keys(obj, path="$"):
         problems = []
 
@@ -669,22 +646,23 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
                     }, 403)
                     return
 
+                for label, key in (
+                    ("device_id", device_id),
+                    ("client_ip", client_ip),
+                ):
+                    if (
+                        not isinstance(key, str)
+                        or not key
+                        or any(char in key for char in ".$#[]/")
+                    ):
+                        print(f"Invalid Firebase key: {label}")
+                        self.send_json(
+                            {"error": "מזהה המצביע אינו תקין. יש לנסות שוב."},
+                            400
+                        )
+                        return
+
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-for label, key in (
-    ("device_id", device_id),
-    ("client_ip", client_ip),
-):
-    if (
-        not isinstance(key, str)
-        or not key
-        or any(char in key for char in ".$#[]/")
-    ):
-        print(f"Invalid Firebase key: {label}")
-        self.send_json(
-            {"error": "מזהה המצביע אינו תקין. יש לנסות שוב."},
-            400
-        )
-        return
               
                 voted_devs[device_id] = {
                     "party_id": party_id,
