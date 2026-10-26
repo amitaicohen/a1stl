@@ -662,7 +662,7 @@ print("VOTE DEBUG:", {
                         or not key
                         or any(char in key for char in ".$#[]/")
                     ):
-                        print(f"Invalid Firebase key: {label}")
+                      print(f"Invalid Firebase key: {label}")
                         self.send_json(
                             {"error": "מזהה המצביע אינו תקין. יש לנסות שוב."},
                             400
