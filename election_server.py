@@ -620,7 +620,7 @@ class ElectionHandler(http.server.SimpleHTTPRequestHandler):
             client_ip = self.get_client_ip()
             party_id = payload.get("party_id")
             device_id = payload.get("voter_device_id") or self.headers.get("X-Voter-Device-Id") or client_ip
-          
+          print("VOTE DEBUG:", {     "party_id_present": bool(party_id),     "party_id_valid": any(p["id"] == party_id for p in PARTIES),     "device_id_type": type(device_id).__name__,     "device_id_length": len(device_id) if isinstance(device_id, str) else None,     "client_ip_valid": isinstance(client_ip, str) and bool(client_ip) })
 print("VOTE DEBUG:", {
     "party_id_present": bool(party_id),
     "party_id_valid": any(p["id"] == party_id for p in PARTIES),
