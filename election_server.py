@@ -663,6 +663,7 @@ print("VOTE DEBUG:", {
                         or any(char in key for char in ".$#[]/")
                     ):
                       print(f"Invalid Firebase key: {label}")
+                      print(f"Invalid Firebase key: {label}; type={type(key).__name__}; length={len(key) if isinstance(key, str) else 'N/A'}; invalid_chars={[c for c in key if c in '.$#[]/'] if isinstance(key, str) else 'N/A'}")
                         self.send_json(
                             {"error": "מזהה המצביע אינו תקין. יש לנסות שוב."},
                             400
